@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "snapshot_date": "2026-10-30",
+  "note": "渠道入口来自 srvprice.com/servers 与 llms.txt（2026-11-04 更新）。站内不代下单、不收款：本 CLI 只打印 / 打开这些链接。",
+  "providers": [
+    {
+      "id": "aliyun",
+      "label": "阿里云",
+      "kind": "domestic",
+      "channel_url": "https://www.aliyun.com/minisite/goods?userCode=YOURCODE",
+      "entry_note": "云小站推广入口（2026-11-19 确认归本账号）",
+      "official": "https://www.aliyun.com/",
+      "verified_at": "2026-10-30"
+    },
+    {
+      "id": "ucloud",
+      "label": "UCloud",
+      "kind": "domestic",
+      "channel_url": "https://www.ucloud.cn/site/active/kuaijiesale.html?cps_code=AJ5nmGqrThyC5NiHlQWXT8",
+      "channel_urls": {
+        "cn": "https://www.ucloud.cn/site/active/kuaijiesale.html?cps_code=AJ5nmGqrThyC5NiHlQWXT8",
+        "hk": "https://www.ucloud.cn/site/active/hk-global.html?cps_code=AJ5nmGqrThyC5NiHlQWXT8",
+        "overseas": "https://www.ucloud.cn/site/active/tw-global.html?cps_code=AJ5nmGqrThyC5NiHlQWXT8",
+        "gpu": "https://www.ucloud.cn/site/active/gpu.html?cps_code=AJ5nmGqrThyC5NiHlQWXT8"
+      },
+      "entry_note": "渠道入口含 CPS 归因参数",
+      "official": "https://www.ucloud.cn/",
+      "verified_at": "2026-10-30"
+    },
+    {
+      "id": "westcn",
+      "label": "西部数码",
+      "kind": "domestic",
+      "channel_url": "https://www.west.cn/active/freetc/?ReferenceID=YOUR_REFERENCE_ID",
+      "channel_urls": {
+        "new_user": "https://www.west.cn/active/freetc/?ReferenceID=YOUR_REFERENCE_ID",
+        "configurator": "https://www.west.cn/services/cloudhost/"
+      },
+      "entry_note": "新用户大礼包与云服务器配置器分开",
+      "official": "https://www.west.cn/",
+      "verified_at": "2026-10-30"
+    },
+    {
+      "id": "tencent",
+      "label": "腾讯云",
+      "kind": "domestic",
+      "channel_url": "https://cloud.tencent.com/act/cps/redirect?redirect=2446&cps_key=YOUR_CPS_KEY&from=console",
+      "channel_urls": {
+        "promo": "https://cloud.tencent.com/act/cps/redirect?redirect=2446&cps_key=YOUR_CPS_KEY&from=console",
+        "light_2c2g4m": "https://cloud.tencent.com/act/cps/redirect?redirect=6544&cps_key=YOUR_CPS_KEY&from=console",
+        "hot_32": "https://cloud.tencent.com/act/cps/redirect?redirect=5878&cps_key=YOUR_CPS_KEY&from=console",
+        "lighthouse_overseas": "https://cloud.tencent.com/act/cps/redirect?redirect=5333&cps_key=YOUR_CPS_KEY&from=console"
+      },
+      "entry_note": "渠道入口已接入（2026-11-04）",
+      "official": "https://cloud.tencent.com/",
+      "verified_at": "2026-11-04"
+    },
+    {
+      "id": "ctyun",
+      "label": "天翼云",
+      "kind": "domestic",
+      "channel_url": "https://www.ctyun.cn/h5/auth/register?partnerType=cust&partnerAccountId=f8ce36531d1344d0a2dcc7d87a6d4a21",
+      "entry_note": "推广注册链接（2026-11-04 确认）；活动页 JS 渲染",
+      "official": "https://www.ctyun.cn/",
+      "verified_at": "2026-11-04"
+    },
+    {
+      "id": "jdcloud",
+      "label": "京东云",
+      "kind": "domestic",
+      "channel_url": "https://daili.jd.com/s?linkNo=PGGVJ25I25RYZ6G7NNARB6A4UVKSEPNR3X7YD4POJMGEK7UCYIIPQKZARERGMK2Y3TJGJ3A7267NMJZX4LFD4T7JIE",
+      "entry_note": "推广链接（落云惠购）；推客 11 月条款未发布",
+      "official": "https://www.jdcloud.com/",
+      "verified_at": "2026-11-04"
+    },
+    {
+      "id": "baidu",
+      "label": "百度智能云",
+      "kind": "domestic",
+      "channel_url": "https://cloud.baidu.com/campaign/ambassador-product/index.html?ambassadorId=89925fadf32a47369833f80f55268f79",
+      "entry_note": "大使邀新链接，部分产品仅限大使引荐新客",
+      "official": "https://cloud.baidu.com/",
+      "verified_at": "2026-10-30"
+    },
+    {
+      "id": "digitalocean",
+      "label": "DigitalOcean",
+      "kind": "overseas",
+      "channel_url": "https://m.do.co/c/dc9d152a1289",
+      "entry_note": "推荐计划：被推荐人实付满 $25，推荐人得 $25 credit（不可提现；组织团队不支持）",
+      "official": "https://www.digitalocean.com/",
+      "verified_at": "2026-11-20"
+    },
+    {
+      "id": "vultr",
+      "label": "Vultr",
+      "kind": "overseas",
+      "channel_url": "https://www.vultr.com/?ref=9932021",
+      "entry_note": "推荐计划：$10/付费注册（被推荐人需活跃 30 天+且付款 ≥$10；每月 1/15 日后工作日结算）",
+      "official": "https://www.vultr.com/",
+      "verified_at": "2026-11-20"
+    }
+  ],
+  "overseas_credits": [
+    {
+      "provider": "aws",
+      "label": "AWS · 新免卡入门通道",
+      "offer": "$100 额度 + 做任务再给 $100",
+      "note": "免卡：Google / Apple / GitHub / Amazon 账号登录即可开；正式用按量付费（需补卡转正式账号）",
+      "source_url": "https://aws.amazon.com/blogs/aws/",
+      "verified_at": "2026-10-23",
+      "confidence": "blog"
+    },
+    {
+      "provider": "gcp",
+      "label": "GCP · 新客额度",
+      "offer": "$300 / 90 天",
+      "note": "需卡；额度用完按量",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "unverified"
+    },
+    {
+      "provider": "azure",
+      "label": "Azure · 新客额度",
+      "offer": "$200 / 30 天",
+      "note": "需卡；额度用完按量",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "unverified"
+    },
+    {
+      "provider": "oracle",
+      "label": "Oracle · Always Free",
+      "offer": "免费额度（ARM 机型；2026 年有下调记录）",
+      "note": "邮箱 + 手机 + 真实信用卡（虚拟 / 预付不收）；闲置可能回收",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "unverified"
+    }
+  ]
+}

@@ -1,0 +1,302 @@
+{
+  "id": "volcengine.create_readonly_user",
+  "version": 14,
+  "status": "draft",
+  "vendor": "volcengine",
+  "title": "火山引擎：建只读子账号 + 配 ve CLI",
+  "entry": "https://console.volcengine.com/iam/identitymanage/user",
+  "preconditions": [
+    "用户已在浏览器里登录火山引擎主账号（人机门：登录由用户完成）",
+    "vault 可用，能写入新凭据"
+  ],
+  "steps": [
+    {
+      "step_id": "open_user_management",
+      "do": {
+        "action": "open",
+        "url": "https://console.volcengine.com/iam/identitymanage/user"
+      },
+      "verify": {
+        "text": "用户管理|新建用户",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无权限|请登录|系统繁忙"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "控制台文案以当时页面为准；匹配用文本/可访问性树，不用 CSS"
+    },
+    {
+      "step_id": "open_create_user",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "新建用户"
+        }
+      },
+      "verify": {
+        "text": "创建用户",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "配额已满|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_create_by_username",
+      "do": {
+        "action": "dom_click",
+        "text": "通过用户名创建"
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：点「新建用户」后先出现创建方式选择页"
+    },
+    {
+      "step_id": "fill_user_basic",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "用户名",
+              "id_hint": "UserName"
+            },
+            "value": "muse-ro-test-20261121"
+          },
+          {
+            "match": {
+              "text": "编程访问"
+            },
+            "action": "check"
+          },
+          {
+            "match": {
+              "text": "允许用户管理自己的API密钥"
+            },
+            "action": "check"
+          }
+        ]
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "用户名已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：输入框无 label，用户名用 id_hint=UserName；编程访问是 label 文字（点文字切换）"
+    },
+    {
+      "step_id": "next_to_policy",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "权限设置|选择策略",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "用户名已存在|已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：基本信息 → 下一步进入权限设置"
+    },
+    {
+      "step_id": "next_to_review",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "审阅",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "请先选择"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：权限设置 → 下一步进入审阅页"
+    },
+    {
+      "step_id": "submit_create",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "验证码|短信验证|安全验证",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "已存在|创建失败|失败"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-21 分工校正：审阅页“下一步”由客户端点，人只负责后面的短信验证（human_sms_verify）"
+    },
+    {
+      "step_id": "human_sms_verify",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {
+        "text": "验证失败"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "派单 §4.2：火山建用户时可能触发短信验证码。停下等用户完成，确认后再继续。"
+    },
+    {
+      "step_id": "capture_access_key",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "AccessKeyId",
+          "SecretAccessKey"
+        ],
+        "store": "vault:volcengine/muse-readonly"
+      },
+      "verify": {
+        "secret_shown_once": true
+      },
+      "fail_when": {
+        "text": "密钥已关闭|仅显示一次"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "Secret 只显示一次；读到的值只进 vault，不进回传/日志/截图；用户可下载 CSV，但客户端不落明文"
+    },
+    {
+      "step_id": "attach_readonly_policy",
+      "do": {
+        "action": "attach_policy",
+        "search": "ECSReadOnlyAccess",
+        "select": "ECSReadOnlyAccess",
+        "optional": [
+          {
+            "label": "允许用户管理自己的 API 密钥",
+            "action": "check"
+          }
+        ]
+      },
+      "verify": {
+        "text": "ECSReadOnlyAccess",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "策略不存在|无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：创建向导里勾选的策略不会提交；授权要在创建后：用户详情→权限→添加权限→搜 ECSReadOnlyAccess→勾选→提交"
+    },
+    {
+      "step_id": "commit_attach",
+      "do": {
+        "action": "dom_click",
+        "text": "提交"
+      },
+      "verify": {
+        "text": "已选|授权",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "失败"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-21 分工校正：提交按钮由客户端点，人只负责登录/短信（与 submit_create 同一口径）"
+    },
+    {
+      "step_id": "configure_cli",
+      "do": {
+        "action": "run_command",
+        "command": "ve configure set --profile default --region {{region}} --access-key {{credential.access_key_id}} --secret-key {{credential.secret_access_key}}"
+      },
+      "verify": {
+        "command": "ve configure list",
+        "text": "default"
+      },
+      "fail_when": {
+        "text": "credentials not configured"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "密钥步骤不由命令执行器处理：用 vault-materialize 物化到 ve profile（人机门）"
+    },
+    {
+      "step_id": "enable_deny_writes",
+      "do": {
+        "action": "run_command",
+        "command": "ve configure safety-policy preset deny-writes --overwrite"
+      },
+      "verify": {
+        "command": "ve configure safety-policy show",
+        "text": "enabled"
+      },
+      "fail_when": {
+        "text": "error"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "ve ecs DescribeInstances --MaxResults 1 --region {{region}}"
+      },
+      "verify": {
+        "json_has": "ResponseMetadata"
+      },
+      "fail_when": {
+        "text": "Forbidden|Unauthorized|credentials not configured"
+      },
+      "human": false,
+      "sensitive": false
+    }
+  ],
+  "postconditions": [
+    "vault 中有 volcengine/muse-readonly 的 AK/SK",
+    "`ve configure list` 显示 default profile",
+    "deny-writes 安全策略已启用",
+    "`host list --provider volcengine` 能读"
+  ],
+  "notes": "文案来自 2026-11-20 首次人工跑通记录（zhao 操作、cc 配置 CLI 并验证）。控制台真实按钮文案/角色名需上机校准后 version+1。 2026-11-20 按派单 §4.2/§4.4 修正：补 human_sms_verify 人机门；deny-writes 预设加 --overwrite。 2026-11-20 校准：列表真实地址是 /iam/identitymanage/user（/iam/user 是空壳）；当前账号已存在 muse-readonly（ID 101020902），创建流程需先做存在性检查（待流程引擎支持分支）。 2026-11-20 校准：补 choose_create_by_username（创建方式页）。 2026-11-20 校准：fill_user_basic 改用 id_hint=UserName + 按文字勾选编程访问（v5）。 2026-11-20 校准：补 next_to_review；“允许用户管理自己的API密钥”归入基本信息页；最终创建标人机门（v7）。 2026-11-20 校准：审阅页“下一步”= 提交创建，原 confirm_create 改为 submit_create 并标人机门（v8）。 2026-11-20 端到端校准：测试用户名改为 muse-readonly-test（v9）。 2026-11-20 E2E：muse-readonly-test 已真实创建成功（短信验证由用户完成），ECSReadOnlyAccess 已附加；AccessKeyId/SecretAccessKey + 原 CSV 已存入 vault（VOLCENGINE_MUSE_READONLY_TEST_AK/SK/CSV 并同步到 43），明文 CSV 已删除。 2026-11-20 校准：创建向导的策略勾选不提交（实测 403）；改为创建后“用户详情→权限→添加权限→ECSReadOnlyAccess→提交”；提交按钮文案=提交（v11）。物化 profile muse-readonly-test 已验证可读。 2026-11-21 客户端驱动验收：muse-readonly-test 已存在，测试用户名改 muse-ro-test-20261121（v12）；本轮目标是验证扩展执行链，不再复用旧名。 2026-11-21 客户端驱动 E2E 通过（v13）：前 6 步由 flow run --execute 自动跑完并停在 submit_create；分工校正——submit_create 与 commit_attach 改为客户端点击，人机门只在 human_sms_verify（本次未触发短信）；密钥经页面『全部保存为csv』导出后由 vault-add 以 stdin 入 vault（VOLCENGINE_MUSE_RO_TEST_20261121_AK/SK/CSV），明文 CSV 已删；策略 ECSReadOnlyAccess 已附加（1 成功 0 失败）；vault-materialize 后 ve DescribeInstances 可读、CreateTags 被安全策略拒绝。遗留：run_command 执行器仍未实现，configure_cli/enable_deny_writes/verify_readonly 三步由人工用 vault-materialize + ve 完成。",
+  "variables": {
+    "region": {
+      "default": "cn-beijing",
+      "description": "目标地域"
+    }
+  }
+}

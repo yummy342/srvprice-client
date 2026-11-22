@@ -1,0 +1,490 @@
+{
+  "id": "vultr.create_readonly_user",
+  "version": 3,
+  "status": "active",
+  "vendor": "vultr",
+  "title": "Vultr：Organization IAM 只读（自定义策略 + Service User + API Key）",
+  "entry": "https://console.vultr.com/organizations/policies/",
+  "preconditions": [
+    "浏览器已登录 Vultr 控制台（人机门；可能先过 Cloudflare 安全验证）",
+    "API Access 已启用（启用时 Vultr 会强制生成一把个人全权限 key，属人机门，不在本流程内自动做）",
+    "已经在 Organization 里打开 Identity and Access Management",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_policies",
+      "do": {
+        "action": "open",
+        "url": "https://console.vultr.com/organizations/policies/"
+      },
+      "verify": {
+        "text": "Add permission policy|Permission Policies",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "Verifying|正在安全验证|Log In|Sign in"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 真机校准：/organizations/policies/ 直达策略列表"
+    },
+    {
+      "step_id": "click_add_policy",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "Add permission policy"
+        }
+      },
+      "verify": {
+        "text": "Choose a service",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "Verifying"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_policy_basics",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "Name",
+              "id_hint": "name"
+            },
+            "value": "srvprice-readonly"
+          },
+          {
+            "match": {
+              "label": "Description",
+              "id_hint": "description"
+            },
+            "value": "srvprice CLI read-only (List/Read instances)"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Choose a service",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_service_dropdown",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "Choose a service"
+        }
+      },
+      "verify": {
+        "text": "Instances",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：普通 click 点不开这个下拉，必须 real_click（CDP 真鼠标）"
+    },
+    {
+      "step_id": "choose_instances",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "Instances"
+        }
+      },
+      "verify": {
+        "text": "Instances",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "add_instances_service",
+      "do": {
+        "action": "click_at",
+        "x": 1186,
+        "y": 453
+      },
+      "verify": {
+        "text": "compute.instance.List|compute.instance.Read",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：加服务是图标 + 按钮、没有可匹配文字，只能坐标点击（1264 宽视口下 1186,453）。窗口尺寸/缩放变了要重新量"
+    },
+    {
+      "step_id": "check_list_action",
+      "do": {
+        "action": "check_row",
+        "text": "compute.instance.List"
+      },
+      "verify": {
+        "text": "compute.instance.List",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "只勾 List；不要点表头全选（真机误点过一次会把 18 条策略全选上）"
+    },
+    {
+      "step_id": "check_read_action",
+      "do": {
+        "action": "check_row",
+        "text": "compute.instance.Read"
+      },
+      "verify": {
+        "text": "compute.instance.Read",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "save_policy",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "Add Permission Policy"
+        }
+      },
+      "verify": {
+        "text": "srvprice-readonly",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "创建权限策略，等人确认"
+    },
+    {
+      "step_id": "open_users",
+      "do": {
+        "action": "open",
+        "url": "https://console.vultr.com/organizations/users/"
+      },
+      "verify": {
+        "text": "Add User",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "Log In|Sign in"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "click_add_user",
+      "do": {
+        "action": "click_at",
+        "x": 1158,
+        "y": 219
+      },
+      "verify": {
+        "text": "User Type",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：Add User 按钮同样用坐标点（1264 宽视口）"
+    },
+    {
+      "step_id": "choose_service_user",
+      "do": {
+        "action": "click_at",
+        "x": 877,
+        "y": 127
+      },
+      "verify": {
+        "text": "Service User Name",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：点 Service User 单选框（CSS 坐标，随抽屉滚动会变）"
+    },
+    {
+      "step_id": "fill_service_user",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "Service User Name"
+            },
+            "value": "srvprice-readonly"
+          },
+          {
+            "match": {
+              "label": "Email Address",
+              "id_hint": "email"
+            },
+            "value": "{{service_user_email}}"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Groups|Roles|Policies",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "already in use|已被使用|invalid email"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "邮箱必须与组织内其他用户不重复；2026-11-20 用 user@example.com 提交后静默失败（疑似冲突），待换邮箱重测"
+    },
+    {
+      "step_id": "scroll_to_policies",
+      "do": {
+        "action": "scroll_container",
+        "near_text": "Service User Name",
+        "dy": 550
+      },
+      "verify": {
+        "text": "Policies",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "check_policy",
+      "do": {
+        "action": "check_row",
+        "text": "srvprice-readonly"
+      },
+      "verify": {
+        "text": "1 policy selected|1/18",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "18 policies selected"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "只允许 1 条策略被选中；出现『18 policies selected』立即停"
+    },
+    {
+      "step_id": "review_and_add",
+      "do": {
+        "action": "dom_click",
+        "text": "Review and add"
+      },
+      "verify": {
+        "text": "Review your selections|Add service user",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：这是两步确认，先 Review and add，再 Add service user"
+    },
+    {
+      "step_id": "confirm_service_user",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "role": "button",
+          "text": "Add service user"
+        }
+      },
+      "verify": {
+        "text": "srvprice-readonly",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 真机跑通：换唯一邮箱（service@example.com）后创建成功；邮箱必须与组织内其他用户不重复"
+    },
+    {
+      "step_id": "open_service_user",
+      "do": {
+        "action": "dom_click",
+        "text": "View srvprice-readonly"
+      },
+      "verify": {
+        "text": "API Keys",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机：列表里的 View 链接用 dom_click 能进详情页（real_click 只会出 tooltip）"
+    },
+    {
+      "step_id": "create_api_key",
+      "do": {
+        "action": "dom_click",
+        "text": "Create API Key"
+      },
+      "verify": {
+        "text": "Generate API Key",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_key_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "Key Name (optional)",
+              "id_hint": "name"
+            },
+            "value": "muse-readonly"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Generate API Key",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "generate_key",
+      "do": {
+        "action": "dom_click",
+        "text": "Generate API Key"
+      },
+      "verify": {
+        "text": "Finalize Key Generation",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "key 只显示一次；先跑 vault-capture --vendor vultr --profile muse-readonly（正则 [A-Z0-9]{36}）入库，再点 Finalize"
+    },
+    {
+      "step_id": "finalize_key",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "I have successfully copied the key"
+        }
+      },
+      "verify": {
+        "text": "Finalize Key Generation",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "confirm_finalize",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "role": "button",
+          "text": "Finalize Key Generation"
+        }
+      },
+      "verify": {
+        "text": "muse-readonly",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "allow_client_ip",
+      "do": {
+        "action": "dom_click",
+        "text": "Add IP to Allowlist"
+      },
+      "verify": {
+        "text": "Subnet Address",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 真机：service user 默认 ACL 不允许本机 IPv6（报 Unauthorized IP address）；需把客户端 IPv6 /64 加进 Allowlist（{{client_ipv6_prefix}}）"
+    },
+    {
+      "step_id": "fill_acl_subnet",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "name": "subnetAddress"
+            },
+            "value": "{{client_ipv6_prefix}}"
+          },
+          {
+            "match": {
+              "name": "subnetSize"
+            },
+            "value": "64"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Add Subnet",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "save_acl_subnet",
+      "do": {
+        "action": "dom_click",
+        "text": "Add Subnet"
+      },
+      "verify": {
+        "text": "Unnamed ACL",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "vultr-cli instance list -o json"
+      },
+      "verify": {
+        "json_has": "instances"
+      },
+      "fail_when": {
+        "text": "Permission denied|Unauthorized IP address|Invalid authentication"
+      },
+      "human": false,
+      "sensitive": true,
+      "note": "2026-11-20 真机：实例列表成功；dns domain list 返回 403 IAM permission denied，证明 key 只被授予 instance List/Read"
+    }
+  ]
+}

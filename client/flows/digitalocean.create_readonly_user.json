@@ -1,0 +1,141 @@
+{
+  "id": "digitalocean.create_readonly_user",
+  "version": 3,
+  "status": "active",
+  "vendor": "digitalocean",
+  "title": "DigitalOcean：建只读 API Token + 配 doctl",
+  "entry": "https://cloud.digitalocean.com/account/api/tokens",
+  "preconditions": [
+    "浏览器已登录 DigitalOcean 控制台（人机门）",
+    "账号可创建 Personal Access Token",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_tokens",
+      "do": {
+        "action": "open",
+        "url": "https://cloud.digitalocean.com/account/api/tokens"
+      },
+      "verify": {
+        "text": "Generate New Token|Tokens",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "Log in|Sign in|登录"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "未登录会跳到 /login —— 人机门"
+    },
+    {
+      "step_id": "click_generate_token",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Generate New Token"
+        }
+      },
+      "verify": {
+        "text": "Token name|Name|Scopes",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_token_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "Token Name|Token name",
+              "id_hint": "name"
+            },
+            "value": "muse-readonly"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Scopes|Read Only|Custom",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_read_only",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "Read Only"
+        }
+      },
+      "verify": {
+        "text": "Read Only",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "真机校准（2026-11-20）：页面上永远有 Full Access/Custom Scopes 文案，不能用作 fail_when；以单选圈是否选中为准，改用截图/探针核对"
+    },
+    {
+      "step_id": "generate_token",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Generate Token"
+        }
+      },
+      "verify": {
+        "text": "token|Token",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 真机：step run 对 human 步骤只停不执行，--force 也不会点；校准时用 /exec 直接点击"
+    },
+    {
+      "step_id": "capture_token",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "token"
+        ],
+        "store": "vault:doctl/muse-readonly"
+      },
+      "verify": {
+        "secret_shown_once": true
+      },
+      "fail_when": {
+        "text": "not available|不可用"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "2026-11-20 真机跑通：token 在提示条里是纯文本、不是输入框，read_fields 抓不到；实际用 `vault-capture --vendor doctl --profile muse-readonly`（正则 dop_v1_）直接入 vault"
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "DIGITALOCEAN_ACCESS_TOKEN={{credential.token}} doctl account get"
+      },
+      "verify": {
+        "json_has": "account"
+      },
+      "fail_when": {
+        "text": "Unauthorized|Unable to authenticate|access token is required"
+      },
+      "human": false,
+      "sensitive": true,
+      "note": "只读验证：能读账户信息即成功"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "aliyun.attach_sms_policy",
+  "version": 1,
+  "status": "draft",
+  "vendor": "aliyun",
+  "title": "阿里云：给现有 RAM 用户加短信发送权限",
+  "entry": "https://ram.console.aliyun.com/users",
+  "preconditions": [
+    "用户已在浏览器登录阿里云主账号",
+    "目标用户 muse-readonly-demo 在用户列表第一行"
+  ],
+  "steps": [
+    {
+      "step_id": "open_users",
+      "do": {
+        "action": "open",
+        "url": "https://ram.console.aliyun.com/users"
+      },
+      "verify": {
+        "text": "用户",
+        "timeout_ms": 15000
+      },
+      "fail_when": { "text": "请登录|无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "click_authorize",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "新增授权"
+        }
+      },
+      "verify": {
+        "text": "新增授权",
+        "timeout_ms": 10000
+      },
+      "fail_when": { "text": "请登录|无权限" },
+      "human": false,
+      "sensitive": false,
+      "note": "用户列表第一行是 muse-readonly-demo，点它的“新增授权”"
+    },
+    {
+      "step_id": "attach_sms",
+      "do": {
+        "action": "attach_policy",
+        "search": "AliyunSMSFullAccess",
+        "select": "AliyunSMSFullAccess"
+      },
+      "verify": {
+        "text": "AliyunSMSFullAccess",
+        "timeout_ms": 20000
+      },
+      "fail_when": { "text": "无权限|加载失败" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "confirm",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "确定"
+        }
+      },
+      "verify": {
+        "text": "AliyunSMSFullAccess",
+        "timeout_ms": 20000
+      },
+      "fail_when": { "text": "授权失败|无权限" },
+      "human": true,
+      "sensitive": true,
+      "note": "授权是写操作，人工确认"
+    }
+  ],
+  "postconditions": [
+    "muse-readonly-demo 拥有 AliyunSMSFullAccess"
+  ]
+}

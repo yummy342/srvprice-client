@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "snapshot_date": "2026-10-30",
+  "note": "购后维护指引。只给步骤文本，不 SSH、不改用户服务器。通用步骤不绑定厂商原文，逐条标注 confidence=generic；绑定厂商处写 provider。命令示例由用户自己在服务器上执行。",
+  "topics": [
+    {
+      "id": "open-port",
+      "title": "开放端口",
+      "summary": "云服务器的端口有两条拦路：厂商安全组 / 防火墙（控制台）和系统内防火墙（ufw / firewalld）。两条都要放行。",
+      "applies_to": ["aliyun", "ucloud", "westcn", "tencent", "ctyun", "jdcloud", "baidu"],
+      "os": ["linux"],
+      "steps": [
+        { "n": 1, "text": "先确认实例绑定的安全组 / 防火墙规则：入方向放行目标端口，来源按需收紧到固定 IP，不要图省事写 0.0.0.0/0。" },
+        { "n": 2, "text": "Web 服务只开放 80 / 443；管理端口（22 / 面板端口）建议限制来源 IP。" },
+        { "n": 3, "text": "系统内防火墙（以 ufw 为例）：sudo ufw allow 443/tcp && sudo ufw reload；firewalld：sudo firewall-cmd --add-port=443/tcp --permanent && sudo firewall-cmd --reload。" },
+        { "n": 4, "text": "验证：从外部执行 nc -vz <IP> 443，或在线端口检测；本机自测通过不代表外部可达。" }
+      ],
+      "verify": "从另一台机器（非本机）发起连接，或使用第三方端口检测服务。",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "generic"
+    },
+    {
+      "id": "ssh-key",
+      "title": "SSH 密钥登录",
+      "summary": "用密钥替代密码登录。私钥只留在本机，公钥放到服务器 ~/.ssh/authorized_keys。",
+      "applies_to": ["aliyun", "ucloud", "westcn", "tencent", "ctyun", "jdcloud", "baidu", "digitalocean", "vultr"],
+      "os": ["linux"],
+      "steps": [
+        { "n": 1, "text": "本机生成密钥：ssh-keygen -t ed25519 -C \"you@host\"，一路回车（如需口令短语可设置）。" },
+        { "n": 2, "text": "复制公钥：ssh-copy-id -i ~/.ssh/id_ed25519.pub user@<IP>；或手工把 id_ed25519.pub 内容追加到服务器 ~/.ssh/authorized_keys。" },
+        { "n": 3, "text": "验证免密登录成功后，再在服务器 /etc/ssh/sshd_config 设 PasswordAuthentication no，然后 systemctl reload sshd。" },
+        { "n": 4, "text": "确认无误前不要关闭当前会话——配错了只能走控制台 VNC 救援。" },
+        { "n": 5, "text": "多数厂商创建实例时支持直接注入公钥；已注入的实例无需再手工复制。" }
+      ],
+      "verify": "新开一个终端 ssh -o PasswordAuthentication=no user@<IP> 能直接进入。",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "generic"
+    },
+    {
+      "id": "swap",
+      "title": "配置 swap（小内存机型）",
+      "summary": "1G / 2G 内存机型在跑数据库或构建时容易 OOM，加一块 swap 作缓冲。",
+      "applies_to": ["*"],
+      "os": ["linux"],
+      "steps": [
+        { "n": 1, "text": "创建 swap 文件（以 2G 为例）：sudo fallocate -l 2G /swapfile（不支持 fallocate 时用 dd if=/dev/zero of=/swapfile bs=1M count=2048）。" },
+        { "n": 2, "text": "权限收紧：sudo chmod 600 /swapfile。" },
+        { "n": 3, "text": "格式化并启用：sudo mkswap /swapfile && sudo swapon /swapfile。" },
+        { "n": 4, "text": "持久化：把 /swapfile none swap sw 0 0 追加到 /etc/fstab。" },
+        { "n": 5, "text": "调低换出倾向：sudo sysctl vm.swappiness=10，并写入 /etc/sysctl.conf。" }
+      ],
+      "verify": "free -h 中 Swap 行显示已用容量。",
+      "source_url": null,
+      "verified_at": "2026-10-30",
+      "confidence": "generic"
+    },
+    {
+      "id": "docker-install",
+      "title": "安装 Docker",
+      "summary": "用官方仓库装 Docker Engine，不要用发行版自带的旧版本包。",
+      "applies_to": ["*"],
+      "os": ["ubuntu", "debian", "centos"],
+      "steps": [
+        { "n": 1, "text": "卸载旧包（如装过）：sudo apt remove docker docker-engine docker.io containerd runc。" },
+        { "n": 2, "text": "按官方文档添加 Docker 仓库（Ubuntu / Debian 用 apt，CentOS 用 dnf），再 sudo apt install docker-ce docker-ce-cli containerd.io。" },
+        { "n": 3, "text": "国内机器拉镜像慢时配置镜像加速器（写 /etc/docker/daemon.json 的 registry-mirrors），改完 sudo systemctl restart docker。" },
+        { "n": 4, "text": "非 root 使用：sudo usermod -aG docker $USER，重新登录生效。" }
+      ],
+      "verify": "sudo docker run --rm hello-world 输出 Hello from Docker!",
+      "source_url": "https://docs.docker.com/engine/install/",
+      "verified_at": "2026-10-30",
+      "confidence": "generic"
+    },
+    {
+      "id": "icp-filing",
+      "title": "ICP 备案判断",
+      "summary": "大陆地域建站必须备案；港澳台 / 海外地域不需要工信部 ICP 备案，但个别厂商 FAQ 另有公安联网备案要求。",
+      "applies_to": ["aliyun", "ucloud", "westcn", "tencent", "ctyun", "jdcloud", "baidu"],
+      "os": ["*"],
+      "steps": [
+        { "n": 1, "text": "只买服务器、不解析域名、不开 Web 服务：不触发 ICP 备案。" },
+        { "n": 2, "text": "域名指向大陆节点提供网站服务：必须先备案，未备案域名会被监测封堵。" },
+        { "n": 3, "text": "腾讯云备案要求购买大陆包年包月机 ≥3 个月、备案时剩余有效期 ≥1 个月。" },
+        { "n": 4, "text": "海外 / 港澳台机型：腾讯云明确「无需备案、也不能用于备案」；阿里云香港官方 FAQ 称仍需公安联网备案；天翼云、百度未找到香港免备案声明——不要替用户断言免备案。" }
+      ],
+      "verify": "在目标厂商备案控制台确认当前域名与实例的地域、有效期是否满足要求。",
+      "source_url": "https://www.srvprice.com/servers/",
+      "verified_at": "2026-10-30",
+      "confidence": "page"
+    }
+  ]
+}

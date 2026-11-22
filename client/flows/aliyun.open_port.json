@@ -1,0 +1,179 @@
+{
+  "id": "aliyun.open_port",
+  "version": 2,
+  "status": "active",
+  "vendor": "aliyun",
+  "variables": {
+    "group_name": { "description": "新安全组名（ASCII）。建议 srvprice-<ip点换横线>-<port>" },
+    "source_cidr": { "description": "允许访问的来源 CIDR，例如 1.2.3.4/32" }
+  },
+  "title": "阿里云：新建安全组 + 开限源端口（不绑实例）",
+  "entry": "https://ecs.console.aliyun.com/securityGroup/region/cn-beijing/create",
+  "preconditions": [
+    "浏览器已登录阿里云控制台（人机门：登录由用户完成）",
+    "地域为华北2（cn-beijing），实例所在 VPC 在创建页默认可选",
+    "已在 RAM 侧拿到安全组写权限（或走已登录主账号的浏览器会话）"
+  ],
+  "steps": [
+    {
+      "step_id": "open_create_page",
+      "do": { "action": "open", "url": "https://ecs.console.aliyun.com/securityGroup/region/cn-beijing/create" },
+      "verify": { "text": "安全组名称|创建安全组", "timeout_ms": 15000 },
+      "fail_when": { "text": "请登录" },
+      "human": false,
+      "sensitive": false,
+      "note": "直接进创建页，避开列表页按钮的歧义"
+    },
+    {
+      "step_id": "fill_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          { "match": { "id_hint": "SecurityGroupName" }, "value": "{{group_name}}" }
+        ]
+      },
+      "verify": { "text": "安全组名称", "timeout_ms": 8000 },
+      "fail_when": { "text": "名称不合法|已存在" },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-21 实测：name 输入框有 name=SecurityGroupName，可稳定定位"
+    },
+    {
+      "step_id": "confirm_create",
+      "do": { "action": "dom_click", "text": "确定创建" },
+      "verify": { "text": "安全组创建成功", "timeout_ms": 20000 },
+      "fail_when": { "text": "创建失败|已达上限|数量限制" },
+      "human": false,
+      "sensitive": false,
+      "note": "本步只建专用组；向导会自动加 5 条 0.0.0.0/0 默认规则，后续步骤清掉"
+    },
+    {
+      "step_id": "open_detail",
+      "do": { "action": "dom_click", "text": "查看安全组详情" },
+      "verify": { "text": "访问规则", "timeout_ms": 15000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false,
+      "note": "进入刚建好的组"
+    },
+    {
+      "step_id": "mark_default_icmp",
+      "do": { "action": "check_row", "text": "ICMP-IPv4" },
+      "verify": { "text": "访问规则", "timeout_ms": 5000 },
+      "fail_when": { "text": "暂无数据" },
+      "human": false,
+      "sensitive": false,
+      "note": "默认模板规则 1/5（模板可能变化，变化即失败，需重新校准）"
+    },
+    {
+      "step_id": "mark_default_rdp",
+      "do": { "action": "check_row", "text": "RDP(3389)" },
+      "verify": { "text": "访问规则", "timeout_ms": 5000 },
+      "fail_when": { "text": "暂无数据" },
+      "human": false,
+      "sensitive": false,
+      "note": "默认模板规则 2/5"
+    },
+    {
+      "step_id": "mark_default_ssh",
+      "do": { "action": "check_row", "text": "SSH(22)" },
+      "verify": { "text": "访问规则", "timeout_ms": 5000 },
+      "fail_when": { "text": "暂无数据" },
+      "human": false,
+      "sensitive": false,
+      "note": "默认模板规则 3/5"
+    },
+    {
+      "step_id": "mark_default_https",
+      "do": { "action": "check_row", "text": "HTTPS(443)" },
+      "verify": { "text": "访问规则", "timeout_ms": 5000 },
+      "fail_when": { "text": "暂无数据" },
+      "human": false,
+      "sensitive": false,
+      "note": "默认模板规则 4/5"
+    },
+    {
+      "step_id": "mark_default_http",
+      "do": { "action": "check_row", "text": "HTTP(80)" },
+      "verify": { "text": "访问规则", "timeout_ms": 5000 },
+      "fail_when": { "text": "暂无数据" },
+      "human": false,
+      "sensitive": false,
+      "note": "默认模板规则 5/5"
+    },
+    {
+      "step_id": "batch_delete_defaults",
+      "do": { "action": "dom_click", "text": "批量删除" },
+      "verify": { "text": "批量删除安全组规则", "timeout_ms": 8000 },
+      "fail_when": { "text": "请选择" },
+      "human": false,
+      "sensitive": false,
+      "note": "确认框出现"
+    },
+    {
+      "step_id": "confirm_delete_defaults",
+      "do": { "action": "dom_click", "text": "确定" },
+      "verify": { "text": "访问规则（0", "timeout_ms": 15000 },
+      "fail_when": { "text": "失败" },
+      "human": false,
+      "sensitive": false,
+      "note": "清空默认规则，确保不会留着全网开放"
+    },
+    {
+      "step_id": "open_add_rule",
+      "do": { "action": "real_click", "match": { "text": "增加规则" } },
+      "verify": { "text": "新建安全组规则", "timeout_ms": 10000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false,
+      "note": "real_click 走 CDP，能触发 antd 的点击处理"
+    },
+    {
+      "step_id": "pick_rdp_template",
+      "do": { "action": "real_click", "match": { "text": "RDP" } },
+      "verify": { "text": "RDP(3389)", "timeout_ms": 8000 },
+      "fail_when": { "text": "不可用" },
+      "human": false,
+      "sensitive": false,
+      "note": "快捷模板带出 自定义TCP + 3389"
+    },
+    {
+      "step_id": "fill_source",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          { "match": { "near_text": "访问来源" }, "value": "{{source_cidr}}" }
+        ]
+      },
+      "verify": { "text": "访问来源", "timeout_ms": 8000 },
+      "fail_when": { "text": "格式错误|不合法" },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-21 实测 near_text 能写进 arco 受控输入框"
+    },
+    {
+      "step_id": "submit_rule",
+      "do": { "action": "dom_click", "text": "提交" },
+      "verify": { "text": "访问规则（1", "timeout_ms": 15000 },
+      "fail_when": { "text": "冲突|已存在|失败" },
+      "human": false,
+      "sensitive": false,
+      "note": "页面确认按钮叫“提交”，不是“确定”"
+    },
+    {
+      "step_id": "verify_unbound",
+      "do": { "action": "real_click", "match": { "text": "实例列表" } },
+      "verify": { "text": "暂无数据|实例 ID", "timeout_ms": 10000 },
+      "fail_when": { "text": "加载失败" },
+      "human": false,
+      "sensitive": false,
+      "note": "红线校验：新组不应绑定任何实例；出现实例行需人工复核"
+    }
+  ],
+  "postconditions": [
+    "新增一个专用安全组，只有一条 限源 3389 入方向规则",
+    "没有绑定任何实例",
+    "现有安全组未被修改"
+  ],
+  "notes": "2026-11-21 由 cc 在华北2真机验证：新建 sg-EXAMPLE000000000000，删除向导自动加的 5 条 0.0.0.0/0 规则，只留 TCP 3389 ← 203.0.113.0/32，未绑实例。v2 已参数化：group_name / source_cidr 由 `flow run --var` 传入；端口固定为 RDP 3389 模板，换端口需另建流程或改选模板。默认模板规则名变化会让 mark_default_* 失败——按“失效即回退搜索并 version+1”处理。"
+}

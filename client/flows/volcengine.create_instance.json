@@ -1,0 +1,166 @@
+{
+  "id": "volcengine.create_instance",
+  "version": 1,
+  "status": "active",
+  "vendor": "volcengine",
+  "title": "火山引擎：创建实例（配置到付款前）",
+  "entry": "https://console.volcengine.com/ecs/region:ecs+cn-beijing/buy",
+  "variables": {
+    "instance_type": {
+      "default": "ecs.g4i.large",
+      "description": "实例规格 ID（页面上的规格名）"
+    }
+  },
+  "preconditions": [
+    "浏览器已登录火山引擎主账号",
+    "地域固定为华北2（cn-beijing）",
+    "付款由人完成；本流程只到付款前"
+  ],
+  "steps": [
+    {
+      "step_id": "open_buy",
+      "do": {
+        "action": "open",
+        "url": "https://console.volcengine.com/ecs/region:ecs+cn-beijing/buy"
+      },
+      "verify": {
+        "text": "计费类型|创建实例",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "请登录"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "直接进购买向导，避免列表页按钮歧义"
+    },
+    {
+      "step_id": "choose_pay_as_you_go",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "按量计费"
+        }
+      },
+      "verify": {
+        "text": "后付费|按实际流量计费",
+        "timeout_ms": 12000
+      },
+      "fail_when": {
+        "text": "不可用"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "按量计费：测试首选，随时可释放"
+    },
+    {
+      "step_id": "choose_spec",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "{{instance_type}}"
+        }
+      },
+      "verify": {
+        "text": "{{instance_type}}",
+        "timeout_ms": 12000
+      },
+      "fail_when": {
+        "text": "售罄|不可用"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "默认 g4i.large（2C8G）；规格需在页面可售列表内"
+    },
+    {
+      "step_id": "open_image_picker",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "请选择镜像"
+        }
+      },
+      "verify": {
+        "text": "公共镜像|Ubuntu",
+        "timeout_ms": 12000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_image_os",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "Ubuntu"
+        }
+      },
+      "verify": {
+        "text": "22.04|24.04",
+        "timeout_ms": 12000
+      },
+      "fail_when": {
+        "text": "不可用"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_image_version",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "22.04"
+        }
+      },
+      "verify": {
+        "text": "Ubuntu 22.04",
+        "timeout_ms": 12000
+      },
+      "fail_when": {
+        "text": "不可用"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-21 实测：选完版本后镜像区显示 Ubuntu 22.04"
+    },
+    {
+      "step_id": "agree_terms",
+      "do": {
+        "action": "check_by_label",
+        "label": "我已阅读并同意"
+      },
+      "verify": {
+        "text": "我已阅读并同意",
+        "timeout_ms": 8000
+      },
+      "fail_when": {
+        "text": "请阅读"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "human_password_and_pay",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": true,
+      "note": "人工门：在页面设置登录密码并完成付款；客户端不代输密码、不代付款"
+    }
+  ],
+  "postconditions": [
+    "实例配置完成（按量、指定规格、Ubuntu 22.04、默认网络与 EIP）",
+    "未点击付款；付款和密码由人完成"
+  ],
+  "notes": "2026-11-21 客户端驱动验证：前 7 步全部通过并停在 human_password_and_pay（密码+付款由人完成）；未下单。按量 g4i.large / Ubuntu 22.04 / 默认网络 / EIP / 条款已勾。"
+}

@@ -1,0 +1,219 @@
+{
+  "id": "aliyun.create_readonly_user",
+  "version": 7,
+  "status": "draft",
+  "vendor": "aliyun",
+  "title": "阿里云：建只读子账号 + 配 aliyun CLI",
+  "entry": "https://ram.console.aliyun.com/users",
+  "preconditions": [
+    "用户已在浏览器里登录阿里云主账号（人机门：登录由用户完成）",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_ram_users",
+      "do": {
+        "action": "open",
+        "url": "https://ram.console.aliyun.com/users"
+      },
+      "verify": {
+        "text": "用户",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "请登录|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_create_user",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "创建用户"
+        }
+      },
+      "verify": {
+        "text": "访问方式",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "配额已满|无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：创建用户是 <a class=next-btn>（样式像按钮），不能强求 role=button"
+    },
+    {
+      "step_id": "fill_user_basic",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "near_text": "登录名称"
+            },
+            "value": "muse-readonly-demo"
+          },
+          {
+            "match": {
+              "near_text": "显示名称"
+            },
+            "value": "muse-readonly-demo"
+          },
+          {
+            "match": {
+              "text": "使用永久 AccessKey 访问"
+            },
+            "action": "check"
+          },
+          {
+            "match": {
+              "text": "我确认必须创建 AccessKey"
+            },
+            "action": "check"
+          }
+        ]
+      },
+      "verify": {
+        "text": "AccessKey",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：输入框无 id/label，用 near_text 按字段名定位；访问方式勾“使用永久 AccessKey 访问”"
+    },
+    {
+      "step_id": "confirm_create",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "确定"
+        }
+      },
+      "verify": {
+        "text": "创建成功|已成功",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "创建失败"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "2026-11-20 校准：页面底部“确定”=提交创建（写操作，必须人工确认）"
+    },
+    {
+      "step_id": "human_security_verify",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {
+        "text": "验证失败"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "派单 §4.2：阿里云创建用户时可能触发安全验证（手机/短信）。停下等用户完成，确认后再继续。"
+    },
+    {
+      "step_id": "capture_access_key",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "AccessKeyId",
+          "AccessKeySecret"
+        ],
+        "store": "vault:aliyun/muse-readonly"
+      },
+      "verify": {
+        "secret_shown_once": true
+      },
+      "fail_when": {
+        "text": "仅显示一次"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "阿里云 Secret 只显示一次；值只进 vault"
+    },
+    {
+      "step_id": "attach_readonly_policy",
+      "do": {
+        "action": "attach_policy",
+        "search": "AliyunECSReadOnlyAccess",
+        "select": "AliyunECSReadOnlyAccess"
+      },
+      "verify": {
+        "text": "AliyunECSReadOnlyAccess",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "策略不存在"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 校准：阿里云授权在创建之后——用户列表→点用户→权限→新增授权→搜 AliyunECSReadOnlyAccess；此步待人机门确认/后续校准"
+    },
+    {
+      "step_id": "install_ecs_plugin",
+      "do": {
+        "action": "run_command",
+        "command": "aliyun plugin install --names ecs"
+      },
+      "verify": {
+        "command": "aliyun ecs DescribeRegions"
+      },
+      "fail_when": {
+        "text": "网络错误|权限不足"
+      },
+      "human": false,
+      "note": "幂等：插件已安装时命令返回非 0 但环境已就绪，不算失败（派单 §4.3）",
+      "sensitive": false
+    },
+    {
+      "step_id": "configure_cli",
+      "do": {
+        "action": "run_command",
+        "command": "aliyun configure set --profile default --mode AK --access-key-id {{credential.access_key_id}} --access-key-secret {{credential.secret_access_key}} --region {{region}}"
+      },
+      "verify": {
+        "command": "aliyun configure list",
+        "text": "Valid"
+      },
+      "fail_when": {
+        "text": "ConfigurationError"
+      },
+      "human": false,
+      "sensitive": true
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "aliyun ecs DescribeInstances --MaxResults 1 --RegionId {{region}}"
+      },
+      "verify": {
+        "json_has": "Instances"
+      },
+      "fail_when": {
+        "text": "Forbidden.RAM|InvalidAccessKeyId|SignatureDoesNotMatch"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 实测：策略未授权时会 403 Forbidden.RAM；授权后立即生效"
+    }
+  ],
+  "postconditions": [
+    "vault 中有 aliyun/muse-readonly 的 AK/SK",
+    "`aliyun configure list` 显示 Valid",
+    "`host list --provider aliyun` 返回实例"
+  ],
+  "notes": "文案来自 2026-11-20 人工跑通记录。阿里云控制台改版频繁，按钮文案/角色名需上机校准后 version+1。 2026-11-20 按派单 §4.2/§4.3 修正：补 human_security_verify 人机门；fill_user_basic 增加“我确认必须创建AccessKey”勾选；install_ecs_plugin 改为幂等（already installed 不再算失败）。 2026-11-20 校准：创建用户是整页表单（ram.console.aliyun.com/users/create），fill_user_basic 改 near_text + 勾永久 AccessKey（v3）。 2026-11-20 校准：确认框实际文案为“我确认必须创建 AccessKey”（带空格）；确定=提交创建（v4）。 2026-11-20 校准：顺序修正——先填写+提交创建，再在用户详情里新增授权（v5）。 2026-11-20 校准：创建用户链接是 <a>，匹配去掉 role（v6）。 2026-11-20 E2E：muse-readonly-demo 已创建（安全验证人工完成）；密钥弹窗用 read_dialog_pair 成对抓取入 vault（ALIYUN_MUSE_READONLY_DEMO_AK/SK，已推 43）；AliyunECSReadOnlyAccess 已挂；物化 profile 读取成功。注意：创建时还生成过一把未抓取 Secret 的 key，建议后续在凭证管理里删除。"
+}

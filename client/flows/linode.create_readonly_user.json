@@ -1,0 +1,94 @@
+{
+  "id": "linode.create_readonly_user",
+  "version": 1,
+  "status": "draft",
+  "vendor": "linode",
+  "title": "Linode（Akamai Cloud）：建只读 Personal Access Token + 配 linode-cli",
+  "entry": "https://cloud.linode.com/profile/tokens",
+  "preconditions": [
+    "浏览器已登录 Linode / Akamai Cloud（人机门）",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_tokens",
+      "do": { "action": "open", "url": "https://cloud.linode.com/profile/tokens" },
+      "verify": { "text": "Personal Access Tokens|Create a Personal Access Token", "timeout_ms": 20000 },
+      "fail_when": { "text": "Please log in|Log in|登录" },
+      "human": false,
+      "sensitive": false,
+      "note": "未登录会跳 login.linode.com —— 人机门"
+    },
+    {
+      "step_id": "click_create_token",
+      "do": { "action": "click", "match": { "role": "button", "text": "Create a Personal Access Token" } },
+      "verify": { "text": "Label|Expiry|Scopes", "timeout_ms": 15000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_label",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          { "match": { "label": "Label", "id_hint": "label" }, "value": "muse-readonly" }
+        ]
+      },
+      "verify": { "text": "Expiry|Scopes", "timeout_ms": 10000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_linodes_read_only",
+      "do": { "action": "click", "match": { "row_text": "Linodes" } },
+      "verify": { "text": "Read Only|No Access|Read Write", "timeout_ms": 15000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "在 Linodes 行把权限选为 Read Only（linodes:read_only）"
+    },
+    {
+      "step_id": "choose_read_only_value",
+      "do": { "action": "click", "match": { "text": "Read Only" } },
+      "verify": { "text": "Read Only", "timeout_ms": 10000 },
+      "fail_when": { "text": "Read Write" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "create_token",
+      "do": { "action": "click", "match": { "role": "button", "text": "Create Token" } },
+      "verify": { "text": "token|Token", "timeout_ms": 20000 },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false,
+      "note": "令牌创建后不可修改 scope；最终创建等人确认"
+    },
+    {
+      "step_id": "capture_token",
+      "do": {
+        "action": "read_fields",
+        "fields": ["token"],
+        "store": "vault:linode/muse-readonly"
+      },
+      "verify": { "secret_shown_once": true },
+      "fail_when": { "text": "not available|不可用" },
+      "human": true,
+      "sensitive": true
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "LINODE_CLI_TOKEN={{credential.token}} linode-cli linodes list --json --all-rows"
+      },
+      "verify": { "json_has": "id" },
+      "fail_when": { "text": "Invalid Token|401|尚未配置" },
+      "human": false,
+      "sensitive": true,
+      "note": "只读验证：能列 Linodes 即成功（空账号返回 []）"
+    }
+  ]
+}

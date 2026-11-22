@@ -1,0 +1,20 @@
+{
+  "name": "srvprice-client",
+  "version": "0.1.0",
+  "description": "srvprice 客户端（第一期骨架）：agent 宿主插件 + 浏览器扩展 + 本地桥 + 流程库",
+  "type": "commonjs",
+  "bin": {
+    "srvprice-client": "bin/srvprice-client.js"
+  },
+  "scripts": {
+    "start": "node bin/srvprice-client.js start",
+    "test": "node --test test/flows.test.js test/bridge.test.js test/inventory.test.js test/voice.test.js test/recorder.test.js test/models.test.js test/site.test.js test/intent.test.js test/purchase.test.js"
+  },
+  "dependencies": {
+    "ws": "^8.23.0"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "license": "MIT"
+}

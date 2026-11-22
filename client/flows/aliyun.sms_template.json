@@ -1,0 +1,53 @@
+{
+  "id": "aliyun.sms_template",
+  "version": 1,
+  "status": "draft",
+  "vendor": "aliyun",
+  "title": "阿里云短信：创建运营提醒通知模板",
+  "entry": "https://dysms.console.aliyun.com/overview",
+  "preconditions": [
+    "已登录阿里云主账号",
+    "当前标签是短信服务控制台"
+  ],
+  "steps": [
+    {
+      "step_id": "dismiss_welcome",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "暂不选择"
+        }
+      },
+      "verify": {
+        "text": "模板管理",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "请登录"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_templates",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "模板管理"
+        }
+      },
+      "verify": {
+        "text": "模板管理",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "请登录"
+      },
+      "human": false,
+      "sensitive": false
+    }
+  ],
+  "postconditions": [
+    "模板列表可见"
+  ]
+}

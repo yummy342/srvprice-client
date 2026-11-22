@@ -1,0 +1,15 @@
+node_modules/
+*.log
+dist/
+state.json
+events.jsonl
+bridge-token
+*.bak*
+.smoke/
+
+# 凭据与本机数据（防以后误提交）
+.env
+.env.*
+credentials.json
+all_hosts.json
+all_hosts.err

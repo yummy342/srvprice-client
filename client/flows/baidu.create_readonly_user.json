@@ -1,0 +1,237 @@
+{
+  "id": "baidu.create_readonly_user",
+  "version": 9,
+  "status": "draft",
+  "vendor": "baidu",
+  "title": "百度智能云：建只读子账号 + 配 bce CLI",
+  "entry": "https://console.bce.baidu.com/iam/#/iam/overview",
+  "preconditions": [
+    "用户已在浏览器里登录百度智能云主账号（人机门：登录由用户完成）",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_iam_users",
+      "do": {
+        "action": "navigate",
+        "url": "https://console.bce.baidu.com/iam/#/iam/overview"
+      },
+      "verify": {
+        "text": "多用户访问控制|子用户",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "请登录|无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：IAM 入口是 /iam/#/iam/overview"
+    },
+    {
+      "step_id": "open_sub_user_list",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "子用户"
+        }
+      },
+      "verify": {
+        "text": "子用户管理|创建子用户",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：概览 → 子用户列表"
+    },
+    {
+      "step_id": "open_create_user",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "创建子用户"
+        }
+      },
+      "verify": {
+        "text": "子用户|用户名",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "配额已满|无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：按钮文案是“创建子用户”"
+    },
+    {
+      "step_id": "fill_username",
+      "do": {
+        "action": "real_type",
+        "match": {
+          "id_hint": "name"
+        },
+        "value": "muse-readonly-demo"
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 8000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：用户名是受控输入，用 CDP 真实输入"
+    },
+    {
+      "step_id": "fill_user_basic",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "text": "编程访问"
+            },
+            "action": "check"
+          }
+        ]
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：弹窗表单，用户名 near_text；编程访问勾选"
+    },
+    {
+      "step_id": "ensure_readonly_policy",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 校准：百度有系统只读策略 BCCReadAccessPolicy，直接用它；无需要自定义"
+    },
+    {
+      "step_id": "attach_custom_policy",
+      "do": {
+        "action": "attach_policy",
+        "search": "BCCReadAccessPolicy",
+        "select": "BCCReadAccessPolicy"
+      },
+      "verify": {
+        "text": "BCCReadAccessPolicy",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "策略不存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：优先系统只读策略 BCCReadAccessPolicy（存在；自定义 muse_readonly_bcc 非必需）"
+    },
+    {
+      "step_id": "confirm_create",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "确定"
+        }
+      },
+      "verify": {
+        "text": "创建成功|已创建",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "创建失败"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "2026-11-20 校准：弹窗“确定”=提交创建（写操作，必须人工确认）"
+    },
+    {
+      "step_id": "human_sms_verify",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {
+        "text": "验证失败"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "派单 §4.2：百度建用户时可能触发短信验证。停下等用户完成，确认后再继续。"
+    },
+    {
+      "step_id": "capture_access_key",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "AccessKeyId",
+          "SecretAccessKey"
+        ],
+        "store": "vault:baidu/muse-readonly"
+      },
+      "verify": {
+        "field_present": "SecretAccessKey"
+      },
+      "fail_when": {
+        "text": "仅显示一次|已隐藏"
+      },
+      "human": true,
+      "sensitive": true
+    },
+    {
+      "step_id": "configure_cli",
+      "do": {
+        "action": "run_command",
+        "command": "bce configure set default --access-key-id {{credential.access_key_id}} --secret-access-key {{credential.secret_access_key}} --region {{region}}"
+      },
+      "verify": {
+        "command": "bce configure list",
+        "text": "default"
+      },
+      "fail_when": {
+        "text": "no profile configured"
+      },
+      "human": false,
+      "sensitive": true
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "bce bcc ListInstances --region bj --maxKeys 1"
+      },
+      "verify": {
+        "json_has": "instances"
+      },
+      "fail_when": {
+        "text": "AccessDenied|no profile configured"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 首次人工跑通时在控制台现找过入口，这正是需要落盘的原因"
+    }
+  ],
+  "postconditions": [
+    "vault 中有 baidu/muse-readonly 的 AK/SK",
+    "`bce configure list` 显示 default",
+    "`host list --provider baidu` 能读（bj/gz/su/bd/hkg）"
+  ],
+  "notes": "文案来自 2026-11-20 人工跑通记录；百度控制台入口和角色名需上机校准后 version+1。 2026-11-20 按派单 §4.1/§4.2 修正：补 ensure_readonly_policy 人机门（策略不存在时先建/改挂系统只读策略）；补 human_sms_verify 人机门。 2026-11-20 校准：入口 /iam/#/iam/overview → 子用户列表 → 创建子用户（v3）。 2026-11-20 校准：fill_user_basic 改 near_text + 编程访问（v4）。 2026-11-20 校准：拆出 fill_username（CDP 输入）（v5）。 2026-11-20 校准：用户名输入框 id=name，用 id_hint 定位（v6）。 2026-11-20 校准完成到提交前：入口 overview→子用户→创建子用户弹窗→用户名(id=name, CDP输入)+编程访问；未提交。 2026-11-20 校准：授权抽屉已打开（muse-readonly-demo），系统只读策略 BCCReadAccessPolicy 可用（v8）。 2026-11-20 E2E：muse-readonly-demo 已创建（短信安全验证人工完成）；密钥入 vault（BAIDU_MUSE_READONLY_DEMO_AK/SK，已推 43）；授权抽屉挂上 BCCReadAccessPolicy + VPC/SUBNET/SECURITYGROUP 只读 + IAMManageAccessKeyPolicy。"
+}

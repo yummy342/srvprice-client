@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>srvprice client</title>
+<style>
+  body { font: 13px/1.6 system-ui, sans-serif; width: 300px; margin: 12px; }
+  #status { margin: 4px 0 10px; color: #666; }
+  .on { color: #0a7d32; }
+  .off { color: #b00020; }
+  .wait { color: #8a6d00; }
+  button { padding: 6px 12px; cursor: pointer; margin-right: 6px; }
+  p.hint { color: #888; margin: 10px 0 0; }
+</style>
+<div id="status">检查中…</div>
+<button id="pair">一键配对</button>
+<button id="check">重新检查</button>
+<button id="perm" style="display:none">启用高级操作</button>
+<p class="hint">客户端运行 <code>start --pair</code> 后点「一键配对」即可，不用复制 token。扩展也会在检测到本地桥时自动配对。</p>
+<p class="hint" id="installHint" style="display:none">还没装客户端？<a href="https://www.srvprice.com/download/" target="_blank" rel="noopener">下载客户端</a>，解压后按包内 README 运行 <code>npm install</code> 和 <code>node bin/srvprice-client.js start --pair</code>。</p>
+<p class="hint" id="ver"></p>
+<script src="popup.js"></script>

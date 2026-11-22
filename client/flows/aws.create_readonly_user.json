@@ -1,0 +1,268 @@
+{
+  "id": "aws.create_readonly_user",
+  "version": 1,
+  "status": "draft",
+  "vendor": "aws",
+  "title": "AWS：建只读 IAM 用户 + 配 aws CLI",
+  "entry": "https://console.aws.amazon.com/iam/home#/users",
+  "preconditions": [
+    "浏览器已登录 AWS 控制台主账号（人机门：登录由用户完成）",
+    "主账号有 IAM 管理权限",
+    "vault 可用，能写入新凭据"
+  ],
+  "steps": [
+    {
+      "step_id": "open_users",
+      "do": {
+        "action": "open",
+        "url": "https://console.aws.amazon.com/iam/home#/users"
+      },
+      "verify": {
+        "text": "Create user|创建用户",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "Sign in|Sign-in|登录"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "未登录会停在 signin.aws.amazon.com —— 属人机门，停下来让用户登录"
+    },
+    {
+      "step_id": "click_create_user",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Create user|创建用户"
+        }
+      },
+      "verify": {
+        "text": "User name|用户名",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "Access denied|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_user_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "label": "User name|用户名",
+              "id_hint": "User name"
+            },
+            "value": "muse-readonly"
+          }
+        ]
+      },
+      "verify": {
+        "text": "Next|下一步",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "already exists|已存在"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "next_to_permissions",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Next|下一步"
+        }
+      },
+      "verify": {
+        "text": "Set permissions|设置权限",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_attach_policies",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "Attach policies directly|直接附加策略"
+        }
+      },
+      "verify": {
+        "text": "Policies|策略",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "attach_ec2_readonly",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "AmazonEC2ReadOnlyAccess"
+        }
+      },
+      "verify": {
+        "text": "AmazonEC2ReadOnlyAccess",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "No results|无结果"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "AWS 没有 AmazonLightsailReadOnlyAccess 托管策略；需要 Lightsail 时另加自定义 lightsail:Get*"
+    },
+    {
+      "step_id": "next_review",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Next|下一步"
+        }
+      },
+      "verify": {
+        "text": "Review|Review and create|检查",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "create_user",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Create user|创建用户"
+        }
+      },
+      "verify": {
+        "text": "created|已创建",
+        "timeout_ms": 20000
+      },
+      "fail_when": {
+        "text": "Access denied|Error"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "最终创建，等人确认"
+    },
+    {
+      "step_id": "open_user_detail",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "muse-readonly"
+        }
+      },
+      "verify": {
+        "text": "Security credentials|安全凭证",
+        "timeout_ms": 15000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "create_access_key",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Create access key|创建访问密钥"
+        }
+      },
+      "verify": {
+        "text": "Access key|访问密钥",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "limit|限制"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_cli_usecase",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "Command Line Interface (CLI)|命令行界面 (CLI)|命令行界面（CLI）"
+        }
+      },
+      "verify": {
+        "text": "Next|下一步",
+        "timeout_ms": 10000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "confirm_create_key",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "Create access key|创建访问密钥"
+        }
+      },
+      "verify": {
+        "text": "Access key created|已创建访问密钥",
+        "timeout_ms": 20000
+      },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "capture_keys",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "Access key",
+          "Secret access key"
+        ],
+        "store": "vault:aws/muse-readonly"
+      },
+      "verify": {
+        "secret_shown_once": true
+      },
+      "fail_when": {
+        "text": "not available|不可用"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "Secret 只显示一次；值只进 vault，不写日志"
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "SRVPRICE_AWS_ACCESS_KEY_ID={{credential.access_key_id}} SRVPRICE_AWS_SECRET_ACCESS_KEY={{credential.secret_access_key}} aws ec2 describe-regions --region us-east-1 --output json"
+      },
+      "verify": {
+        "json_has": "Regions"
+      },
+      "fail_when": {
+        "text": "AuthFailure|InvalidClientTokenId|Unable to locate credentials"
+      },
+      "human": false,
+      "sensitive": true,
+      "note": "只读验证：能列地域即成功；写操作应被只读策略拒绝"
+    }
+  ]
+}

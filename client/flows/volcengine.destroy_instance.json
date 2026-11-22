@@ -1,0 +1,59 @@
+{
+  "id": "volcengine.destroy_instance",
+  "version": 1,
+  "status": "draft",
+  "destructive": true,
+  "confirm_value": "{{instance_id}}",
+  "vendor": "volcengine",
+  "title": "火山引擎：删除（释放）实例",
+  "entry": "https://console.volcengine.com/ecs/region:ecs+cn-beijing/instance",
+  "variables": {
+    "instance_id": { "description": "要释放的实例 ID（i-xxxxxxxx）" }
+  },
+  "preconditions": [
+    "已确认实例内无需要保留的数据（本流程不自动做快照）",
+    "终端必须用 --confirm <实例ID> 完成第一道确认",
+    "页面弹窗中的最终确认由人点击（第二道确认）"
+  ],
+  "steps": [
+    {
+      "step_id": "open_instance_list",
+      "do": { "action": "open", "url": "https://console.volcengine.com/ecs/region:ecs+cn-beijing/instance" },
+      "verify": { "text": "创建实例|实例", "timeout_ms": 20000 },
+      "fail_when": { "text": "请登录" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "select_instance_row",
+      "do": { "action": "click", "match": { "text": "{{instance_id}}" } },
+      "verify": { "text": "{{instance_id}}", "timeout_ms": 12000 },
+      "fail_when": { "text": "暂无数据|没有查询到" },
+      "human": false,
+      "sensitive": false,
+      "note": "按实例 ID 点行；ID 以页面为准"
+    },
+    {
+      "step_id": "open_delete_dialog",
+      "do": { "action": "click", "match": { "text": "删除", "row_text": "{{instance_id}}" } },
+      "verify": { "text": "确认删除|释放|删除实例", "timeout_ms": 12000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "human_final_confirm",
+      "do": { "action": "wait", "ms": 0 },
+      "verify": { "human_confirmed": true },
+      "fail_when": {},
+      "human": true,
+      "sensitive": true,
+      "note": "第二道确认：由人在页面弹窗里核对实例并点击最终删除；客户端不代点"
+    }
+  ],
+  "postconditions": [
+    "实例被释放（不可恢复）",
+    "终端第一道确认 + 页面第二道确认都完成"
+  ],
+  "notes": "2026-11-21 草稿：账号下无可删实例，未做真机校准。首次使用前必须在控制台校准选择器并 version+1；不会自动创建快照/镜像。"
+}

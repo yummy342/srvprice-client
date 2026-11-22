@@ -1,0 +1,427 @@
+{
+  "schema": 1,
+  "snapshot_date": "2026-11-21",
+  "note": "各厂商「联盟推广 / 代理商」两类变现线的公开口径核查（2026-11-21）。只认官方来源；第三方数字一律带 UNVERIFIED 前缀，verified=false 的行不得当作已核实口径转述。CLI 不代申请、不代签约、不代下单。",
+  "count_rule": "verified=true 仅指该线「项目存在 + 机制」经官方页证实；返佣比例/代理价常为合同价或需登录后台查看，即使 verified=true 也可能在 rate 中写 UNVERIFIED。",
+  "status_help": {
+    "ready": "已有身份或已核实可直接接",
+    "apply": "有路但需本人申请/签约/登录后台",
+    "none": "暂无官方入口可走",
+    "unknown": "体系可能存在但无公开来源"
+  },
+  "providers": [
+    {
+      "id": "volcengine",
+      "label": "火山引擎",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "多轮搜索无个人推广/大使/邀请返现的官方入口；官方伙伴站只面向企业伙伴。「不存在」也无官方明文，故记 unverified。"
+        },
+        "agent": {
+          "exists": "yes",
+          "verified": true,
+          "program": "火山引擎合作伙伴计划（分销生态）",
+          "url": "https://partner.volcengine.com/oceanengine/smart-outbound",
+          "rate": "UNVERIFIED：官方只写「政策激励」「多元激励政策」，未公布返佣比例、折扣率或结算周期；第三方称价格逐份谈，不采用。",
+          "entry": "注册伙伴账号 → 企业实名认证 → 选择合作类型 → 签署合作协议（火山审核资质）",
+          "verified_at": "2026-11-21",
+          "note": "代理/代售/经销三类分销模式；方舟代理走企业伙伴路线。"
+        }
+      },
+      "status": { "affiliate": "none", "agent": "apply" },
+      "identity": null,
+      "todo": [
+        {
+          "line": "agent",
+          "action": "企业实名认证后提交合作伙伴申请，走代理商线",
+          "blocker": "返佣与折扣为合同价，需签约后确认",
+          "url": "https://partner.volcengine.com/oceanengine/smart-outbound",
+          "materials": ["企业工商信息与资质文件"]
+        },
+        {
+          "line": "agent",
+          "action": "在浏览器打开伙伴站核对经销伙伴分级与「养虾」MDF 计划",
+          "blocker": "官方伙伴站为 JS 应用，文本抓取读不到详情",
+          "url": "https://partner.volcengine.com/oceanengine/smart-outbound",
+          "materials": []
+        }
+      ],
+      "gaps": [
+        "返佣/折扣比例与结算周期官方未公开",
+        "经销伙伴六级分级与年度业绩门槛仅第三方转述",
+        "方舟（大模型）代理的具体政策与入口未找到",
+        "「养虾」MDF 计划的名称、申请方式与金额条款未核实"
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "westcn",
+      "label": "西部数码",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "yes",
+          "verified": true,
+          "program": "云合伙人计划",
+          "url": "https://www.west.cn/active/tuijiannew/",
+          "rate": "快速收益：推广期首购云产品 25%，维护期 45 天新购/续费/升级弹性云 18%、虚拟主机/企业邮箱/云数据库 15%。持续收益：推广期首购弹性云 18%、其他 15%，维护期永久，续费按保有量分档 5%/10%/15%/20%。",
+          "entry": "注册 → 实名（手机+微信）→ 申请云合伙人；企业与个人均可",
+          "verified_at": "2026-11-21",
+          "note": "两种收益模式二选一，可变更一次但会清空现有关联用户；被推荐者须为从未消费的新注册普通会员。"
+        },
+        "agent": {
+          "exists": "yes",
+          "verified": true,
+          "program": "西部数码渠道合作（代理商）",
+          "url": "https://www.west.cn/services/agent/",
+          "rate": "UNVERIFIED：代理价/折扣比例/返佣无公开口径，靠代理平台差价。",
+          "entry": "UNVERIFIED：官方渠道页未列申请条件（资质/预存款/保证金）",
+          "verified_at": "2026-11-21",
+          "note": "官方页以用户证言呈现，未列分级表；银牌、钻石两档由证言证实。"
+        }
+      },
+      "status": { "affiliate": "apply", "agent": "ready" },
+      "identity": "银牌代理（ID 已脱敏）",
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "申请云合伙人并选定收益模式（二选一，变更会清空关联用户）",
+          "blocker": "zhao 是否已加入云合伙人未核实",
+          "url": "https://www.west.cn/active/tuijiannew/",
+          "materials": ["已完成实名的西部数码账号"]
+        },
+        {
+          "line": "agent",
+          "action": "向商务或代理后台索取代理价目表与升级门槛",
+          "blocker": "代理价/折扣无公开口径",
+          "url": "https://www.west.cn/services/agent/",
+          "materials": ["银牌代理（ID 已脱敏）"]
+        }
+      ],
+      "gaps": [
+        "银牌与钻石之间是否有金牌/铂金等中间档位",
+        "各级代理价/折扣及升级门槛无公开口径",
+        "代理商申请条件（资质/预存款/保证金）无公开口径",
+        "代理 API v2 的公开文档入口未找到",
+        "云合伙人提现最低门槛与手续费官方未说明",
+        "云合伙人与代理身份是否互斥未明确"
+      ],
+      "conflicts": [
+        "返利产品范围：页头称含云数据库，FAQ 两次只列弹性云/虚拟主机/企业邮箱"
+      ]
+    },
+    {
+      "id": "ucloud",
+      "label": "UCloud",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "yes",
+          "verified": true,
+          "program": "UCloud 推广大使（U大使 CPS）",
+          "url": "https://docs.ucloud.cn/cps_platform/mdToPdf/cps_platform.pdf",
+          "rate": "现金奖励 = 90 日内活动产品订单 ×20% + 365 日内非活动产品订单 × 对应比例（分档表 UNVERIFIED）。单用户上限 2 万元，每月总上限 10 万元，累计 ≥50 元才发放。",
+          "entry": "仅个人实名 / 高校实名账号可申请；企业认证暂不支持；被推荐者须首次注册且 90 日内购买指定产品",
+          "verified_at": "2026-11-21",
+          "note": "仅预付费订单（新购/续费）参与；按量付费、退款、退降配、商务折扣 6 折以下不返。"
+        },
+        "agent": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "无官方招募页；但官方 CPS 文档把「渠道代理商」列为独立角色，说明体系存在。计划名称、门槛、代理价均无公开来源。"
+        }
+      },
+      "status": { "affiliate": "apply", "agent": "unknown" },
+      "identity": null,
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "用个人/高校实名账号注册 U大使 并取专属邀请链接",
+          "blocker": "企业实名账号不能成为 U 大使",
+          "url": "https://docs.ucloud.cn/cps_platform/mdToPdf/cps_platform.pdf",
+          "materials": ["个人实名认证的 UCloud 账号"]
+        }
+      ],
+      "gaps": [
+        "非活动产品返佣比例分档表未从官方 PDF 文本中读到",
+        "代理商/渠道伙伴计划无官方公开页面",
+        "推广大使招募入口当前是否开放未核实",
+        "providers.json 的 channel_urls（cn/hk/overseas/gpu）与官方口径对应关系未核对"
+      ],
+      "conflicts": [
+        "第三方「首单 20% 起最高 34%、30 天 cookie」与官方文档（活动产品 20%、90/365 日）冲突，不采信"
+      ]
+    },
+    {
+      "id": "aliyun",
+      "label": "阿里云",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "yes",
+          "verified": true,
+          "program": "阿里云云大使",
+          "url": "https://dashi.aliyun.com/",
+          "rate": "官方口径整体 10%-35%，最高 35%；云资源 15%-25%，大模型+Agent 类 5%-35%。返利以云气值记账，100 云气 = 1 元。2026 年 11 月活动选品含 ECS 与轻量应用服务器。",
+          "entry": "实名认证后免费签约，分享带 userCode 的专属链接/二维码，关联期 90 天",
+          "verified_at": "2026-11-21",
+          "note": "首购、新购、升级、续费均可返利（含沉睡/老用户产品首购）；返利单生成 30 天审核后到账。"
+        },
+        "agent": {
+          "exists": "yes",
+          "verified": true,
+          "program": "Alibaba Cloud Partner Network（Agency / Direct Reseller / Distributor）",
+          "url": "https://www.alibabacloud.com/en/partner/become_partner",
+          "rate": "UNVERIFIED：官方未公布佣金比例或折扣率，均按合同",
+          "entry": "仅限合法企业实体；Agency 需邀请准入；Reseller/Distributor 需专职销售与技术团队",
+          "verified_at": "2026-11-21",
+          "note": "该页为国际站体系；中国站（aliyun.com）国内分销/代理入驻页未找到。"
+        }
+      },
+      "status": { "affiliate": "ready", "agent": "apply" },
+      "identity": "云大使 userCode YOURCODE",
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "登录云大使后台核对等级、关联客户数与待结算返利",
+          "blocker": "本次仅做公开调研，未登录",
+          "url": "https://dashi.aliyun.com/",
+          "materials": ["已签约的云大使账号"]
+        },
+        {
+          "line": "affiliate",
+          "action": "以推广协议原文或官方客服裁定单客户封顶口径（60000 vs 70000）",
+          "blocker": "同一官方规则页两处说法不一致",
+          "url": "https://developer.aliyun.com/article/1007904",
+          "materials": []
+        }
+      ],
+      "gaps": [
+        "返佣封顶冲突未解（60000 元 vs 70000 元）",
+        "后付费/按量付费是否返利，规则 §5 与 §3.3 冲突",
+        "返利产品明细清单全文未提取",
+        "中国站国内代理商入驻页、门槛与折扣未找到",
+        "Agency/Reseller/Distributor 具体比例与折扣不公开"
+      ],
+      "conflicts": [
+        "单客户奖励封顶：同一官方规则页 §三.3 称 60000 元，§三.9 称 70000 元",
+        "后付费是否返利：§5 称可返，§3.3 称按量付费不返佣",
+        "第三方「单用户封顶 9 万、返佣 25%-45%」与官方 35% 上限冲突",
+        "线索（未核实）：2025 版规则按大使等级 L1–L4 分档，70000 可能来自特定等级或旧版"
+      ]
+    },
+    {
+      "id": "tencent",
+      "label": "腾讯云",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "yes",
+          "verified": true,
+          "program": "腾讯云推广大使（CPS）",
+          "url": "https://cloud.tencent.com/act/partner/cps",
+          "rate": "国内站新客户首单每笔 20%-35%，单笔最高 ¥5000，月佣金最高 ¥8 万，会员星级 6 档；国际站固定 30%，单笔最高 1500 美元，月上限 7500 美元。",
+          "entry": "仅限个人实名用户；企业用户不可申请；代理商不能成为推广者，推广账号也不可再转为代理商账号",
+          "verified_at": "2026-11-21",
+          "note": "协议未写固定比例，写明「以推广奖励活动页为准」，腾讯云有权单方调整。cps_key 属敏感归因参数，运行时注入，不写入文件明文（providers.json 已含渠道链接，按现有口径处理）。"
+        },
+        "agent": {
+          "exists": "yes",
+          "verified": true,
+          "program": "腾讯云渠道合作伙伴（代理 / 集成 / ISV / 经销）",
+          "url": "https://main.qcloudimg.com/raw/document/product/pdf/563_15438_cn.pdf",
+          "rate": "UNVERIFIED：公开文档未公布比例，需登录渠道管理后查看「渠道政策」",
+          "entry": "代理：企业实名、注册资金 100 万+且满 1 年、3 人以上销售团队、3 人通过考试、1 万元保证金；经销：500 万+/5 人/1 人考试/5 万保证金；集成：500 万+/20 人；ISV：1000 万+/30 人+软著",
+          "verified_at": "2026-11-21",
+          "note": "2026 年 6 月起接入腾讯供应商协同平台结算，收到账单开票后 5 个工作日内支付。"
+        }
+      },
+      "status": { "affiliate": "apply", "agent": "apply" },
+      "identity": null,
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "先决定走 CPS 还是代理商——二者身份互斥，选定后再申请",
+          "blocker": "代理商不能成为 CPS 推广者，反之亦然",
+          "url": "https://cloud.tencent.com/act/partner/cps",
+          "materials": ["个人实名账号（CPS）或企业实名+保证金（代理）"]
+        },
+        {
+          "line": "affiliate",
+          "action": "注册推广大使并取 cps_key 归因链接",
+          "blocker": "CPS 身份未知，未核实是否已注册",
+          "url": "https://cloud.tencent.com/act/partner/cps?from=21840",
+          "materials": ["身份证", "收款银行账号"]
+        }
+      ],
+      "gaps": [
+        "CPS 指定返佣产品清单未在可读页面核实",
+        "CPS 30 天关联期细节未展开",
+        "代理商返佣比例与代理价需登录后台查看",
+        "国际站 CPS 结算周期细节未核实"
+      ],
+      "conflicts": [
+        "身份互斥：代理商不能成为 CPS 推广者，推广账号不可转为代理商账号",
+        "结算口径：协议称每月下旬，活动页称 1-2 个月内"
+      ]
+    },
+    {
+      "id": "baidu",
+      "label": "百度智能云",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "yes",
+          "verified": false,
+          "program": "百度智能云云推广大使（邀新返利）",
+          "url": "https://cloud.baidu.com/campaign/ambassador/index.html",
+          "rate": "UNVERIFIED：第三方整理为新客首单 20% 起、最高 34%，单笔/单客户/每月均有封顶；官方招募页正文无比例文字，规则文档未读到。",
+          "entry": "实名用户在官方招募页申请 → 生成专属链接；仅计新客户第一单",
+          "verified_at": "2026-11-21",
+          "note": "官方招募页证实计划存在且在招，但返佣规则数字未读到官方原文，故 verified=false。"
+        },
+        "agent": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "未找到官方代理商/合作伙伴招募页。注意：百度推广（搜索广告）代理是另一条业务线，不可混用。"
+        }
+      },
+      "status": { "affiliate": "apply", "agent": "none" },
+      "identity": "providers.json 已有 ambassadorId 链接（ID 89925…），是否本人未核实",
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "确认 providers.json 里的 ambassadorId=89925… 是否为你本人，再决定是否新申请",
+          "blocker": "研究称无已知大使链接，与 providers.json 记录不一致",
+          "url": "https://cloud.baidu.com/campaign/ambassador/index.html",
+          "materials": ["实名认证的百度智能云账号"]
+        },
+        {
+          "line": "affiliate",
+          "action": "读官方规则文档原文核对返佣比例与结算口径",
+          "blocker": "官方 doc 页抓取失败，数字均为第三方",
+          "url": "https://cloud.baidu.com/doc/Yundashi/",
+          "materials": []
+        }
+      ],
+      "gaps": [
+        "返佣规则文档官方原文未读到",
+        "提现门槛、审核方式、封顶具体数值未核实（第三方称官方没写）",
+        "代理商/渠道伙伴无官方入口 URL"
+      ],
+      "conflicts": [
+        "参与身份：招募页称仅个人，规则文档称个人和企业均可",
+        "到账时间：招募页 5-7 个工作日，规则文档 20 个工作日",
+        "计佣范围：只算新客首单 vs 老客产品首购也返"
+      ]
+    },
+    {
+      "id": "jdcloud",
+      "label": "京东云",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "官网首页无推广/返佣/联盟入口，站内检索「代理」零命中。注意：京东联盟是京东商城电商 CPS，与京东云无关。providers.json 现有一条 daili.jd.com 链接（落云惠购），与本轮「无官方入口」结论需对账。"
+        },
+        "agent": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "未找到官方代理商招募页或合作伙伴查询页；第三方 86513.cn 自称授权代理，数字不采信。"
+        }
+      },
+      "status": { "affiliate": "none", "agent": "none" },
+      "identity": null,
+      "todo": [
+        {
+          "line": "affiliate",
+          "action": "核对 providers.json 的 daili.jd.com 推广链接来源与归属",
+          "blocker": "本轮未找到京东云官方推广入口，链接来源不明",
+          "url": "https://www.jdcloud.com/",
+          "materials": []
+        }
+      ],
+      "gaps": [
+        "是否存在面向个人的推广/返佣计划无法证实",
+        "代理商计划入口、条件、佣金/折扣、结算方式均未找到",
+        "第三方所称「京东云合作伙伴查询页面」是否存在未核实",
+        "「云筑计划」是否仍在运行未知"
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "ctyun",
+      "label": "天翼云",
+      "kind": "domestic",
+      "lines": {
+        "affiliate": {
+          "exists": "unverified",
+          "verified": false,
+          "program": null,
+          "url": null,
+          "rate": null,
+          "entry": null,
+          "verified_at": "2026-11-21",
+          "note": "未找到官方 CPS/云推官活动页；抓取片段中的「云推官」是华为云称谓，存在混淆，不采信。providers.json 现有一条 partnerType=cust 注册链接，与本结论需对账。"
+        },
+        "agent": {
+          "exists": "yes",
+          "verified": false,
+          "program": "天翼云合作伙伴认证",
+          "url": "https://www.ctyun.cn/document/10000035",
+          "rate": "UNVERIFIED：第三方称月度激励 5%-45%、季度/年度达量各最高额外 10%、重点产品最高追加 8%，未获官方原文。",
+          "entry": "UNVERIFIED：官方入驻条件页正文为图片渲染，文本读不到细则",
+          "verified_at": "2026-11-21",
+          "note": "官方文档站栏目与子文档标题存在（入驻条件页更新于 2022-04-19），但细则正文未读到，故 verified=false。"
+        }
+      },
+      "status": { "affiliate": "none", "agent": "apply" },
+      "identity": null,
+      "todo": [
+        {
+          "line": "agent",
+          "action": "用浏览器打开合作伙伴认证文档（图片页）或直接问商务要入驻条件",
+          "blocker": "细则为图片渲染，文本抓取读不到",
+          "url": "https://www.ctyun.cn/document/10000035",
+          "materials": ["企业工商资质（第三方说法）"]
+        }
+      ],
+      "gaps": [
+        "联盟推广（云推官/CPS）无官方活动页可定位",
+        "合作伙伴认证细则（扶持政策/入驻条件/FAQ）未读到原文",
+        "代理激励数值仅见第三方文章",
+        "官方渠道合作伙伴招募公告原文未找到"
+      ],
+      "conflicts": []
+    }
+  ]
+}

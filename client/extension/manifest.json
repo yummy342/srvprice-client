@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "name": "srvprice client bridge",
+  "version": "0.1.24",
+  "description": "srvprice 客户端浏览器桥（第一期骨架）：把页面状态回传给本地客户端，并按 steps 执行浏览器动作；密钥/验证码字段永不回传。",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "tts"
+  ],
+  "optional_permissions": ["debugger"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://*.aliyun.com/*",
+    "https://*.alibabacloud.com/*",
+    "https://*.volcengine.com/*",
+    "https://console.cloud.tencent.com/*",
+    "https://console.bce.baidu.com/*",
+    "https://*.ucloud.cn/*",
+    "https://*.jdcloud.com/*",
+    "https://*.ctyun.cn/*",
+    "https://*.west.cn/*",
+    "https://aws.amazon.com/*",
+    "https://*.aws.amazon.com/*",
+    "https://*.digitalocean.com/*",
+    "https://*.vultr.com/*",
+    "https://*.hetzner.com/*",
+    "https://*.hetzner.cloud/*",
+    "https://*.linode.com/*",
+    "https://*.akamai.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "srvprice client",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://127.0.0.1/*",
+        "http://localhost/*"
+      ],
+      "js": [
+        "pair.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://*.aliyun.com/*",
+        "https://*.alibabacloud.com/*",
+        "https://*.volcengine.com/*",
+        "https://console.cloud.tencent.com/*",
+        "https://console.bce.baidu.com/*",
+        "https://*.ucloud.cn/*",
+        "https://*.jdcloud.com/*",
+        "https://*.ctyun.cn/*",
+        "https://*.west.cn/*",
+        "https://aws.amazon.com/*",
+        "https://*.aws.amazon.com/*",
+        "https://*.digitalocean.com/*",
+        "https://*.vultr.com/*",
+        "https://*.hetzner.com/*",
+        "https://*.hetzner.cloud/*",
+        "https://*.linode.com/*",
+        "https://*.akamai.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

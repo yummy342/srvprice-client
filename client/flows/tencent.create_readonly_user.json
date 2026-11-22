@@ -1,0 +1,371 @@
+{
+  "id": "tencent.create_readonly_user",
+  "version": 15,
+  "status": "draft",
+  "vendor": "tencent",
+  "title": "腾讯云：建只读子账号 + 配 tccli",
+  "entry": "https://console.cloud.tencent.com/cam",
+  "preconditions": [
+    "用户已在浏览器里登录腾讯云主账号（人机门：登录由用户完成）",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_cam_users",
+      "do": {
+        "action": "open",
+        "url": "https://console.cloud.tencent.com/cam"
+      },
+      "verify": {
+        "text": "用户列表|用户管理",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "请登录|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_create_user",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "新建用户"
+        }
+      },
+      "verify": {
+        "text": "自定义创建|快速创建",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "配额已满|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_custom_create",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "自定义创建"
+        }
+      },
+      "verify": {
+        "text": "访问方式",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_accessible_type",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "可访问资源并接收消息",
+          "cls": "item"
+        }
+      },
+      "verify": {
+        "text": "可访问资源并接收消息",
+        "timeout_ms": 8000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：腾讯新建子用户第 1 步先选类型"
+    },
+    {
+      "step_id": "next_to_user_info",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "填写用户信息|用户名|访问方式",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：选类型 → 下一步进入填写用户信息"
+    },
+    {
+      "step_id": "fill_username",
+      "do": {
+        "action": "real_type",
+        "match": {
+          "near_text": "用户名"
+        },
+        "value": "muse-readonly-demo2"
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 8000
+      },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：腾讯用户名是受控输入，用 CDP 真实输入（real_type）"
+    },
+    {
+      "step_id": "fill_user_basic",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          {
+            "match": {
+              "text": "编程访问"
+            },
+            "action": "check"
+          }
+        ]
+      },
+      "verify": {
+        "text": "编程访问",
+        "timeout_ms": 10000
+      },
+      "fail_when": {
+        "text": "用户名已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：只负责勾“编程访问”（用户名由 fill_username 处理）"
+    },
+    {
+      "step_id": "next_to_permission",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "设置用户权限|添加至用户组|添加策略",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "用户名不能为空|已存在"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：填写用户信息 → 下一步进入设置用户权限"
+    },
+    {
+      "step_id": "human_captcha",
+      "do": {
+        "action": "wait",
+        "ms": 0
+      },
+      "verify": {
+        "human_confirmed": true
+      },
+      "fail_when": {
+        "text": "验证失败"
+      },
+      "human": true,
+      "sensitive": false,
+      "note": "2026-11-20 校准：腾讯“下一步”后可能弹图片验证码/安全验证，必须人工完成"
+    },
+    {
+      "step_id": "attach_readonly_policy",
+      "do": {
+        "action": "attach_policy",
+        "search": "QcloudCVMReadOnlyAccess",
+        "select": "QcloudCVMReadOnlyAccess"
+      },
+      "verify": {
+        "text": "QcloudCVMReadOnlyAccess",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "策略不存在"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "next_to_tags",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "设置用户标签",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "请选择"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：权限设置 → 下一步进入设置用户标签"
+    },
+    {
+      "step_id": "next_to_review",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "下一步"
+        }
+      },
+      "verify": {
+        "text": "审阅信息和权限",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "请选择"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "2026-11-20 校准：标签页可跳过 → 下一步进入审阅"
+    },
+    {
+      "step_id": "confirm_create",
+      "do": {
+        "action": "real_click",
+        "match": {
+          "text": "完成"
+        }
+      },
+      "verify": {
+        "text": "创建成功|已创建",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "创建失败"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "2026-11-20 校准：审阅页“完成”=提交创建（写操作，必须人工确认）"
+    },
+    {
+      "step_id": "open_user_detail",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "muse-readonly"
+        }
+      },
+      "verify": {
+        "text": "用户详情|API 密钥",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "未找到|无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_api_key_tab",
+      "do": {
+        "action": "click",
+        "match": {
+          "text": "API 密钥"
+        }
+      },
+      "verify": {
+        "text": "密钥|SecretId",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无权限"
+      },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "create_new_key",
+      "do": {
+        "action": "click",
+        "match": {
+          "role": "button",
+          "text": "新建密钥"
+        }
+      },
+      "verify": {
+        "text": "SecretKey",
+        "timeout_ms": 15000
+      },
+      "fail_when": {
+        "text": "无法创建|配额"
+      },
+      "human": false,
+      "sensitive": false,
+      "note": "创建用户时自动生成的 key 可能只显示 SecretId；必须新建一把才能看到 SecretKey（原嵌套 navigate+then 已按派单 §4.5 拆成独立步骤）"
+    },
+    {
+      "step_id": "capture_access_key",
+      "do": {
+        "action": "read_fields",
+        "fields": [
+          "SecretId",
+          "SecretKey"
+        ],
+        "store": "vault:tencent/muse-readonly"
+      },
+      "verify": {
+        "field_present": "SecretKey"
+      },
+      "fail_when": {
+        "text": "仅显示一次|已隐藏"
+      },
+      "human": true,
+      "sensitive": true,
+      "note": "值只进 vault，不进回传/日志/截图"
+    },
+    {
+      "step_id": "configure_cli",
+      "do": {
+        "action": "run_command",
+        "command": "tccli configure set secretId {{credential.secret_id}} secretKey {{credential.secret_key}} region {{region}} output json"
+      },
+      "verify": {
+        "command": "tccli configure list",
+        "text": "secretId"
+      },
+      "fail_when": {
+        "text": "secretId is invalid"
+      },
+      "human": false,
+      "sensitive": true
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "tccli cvm DescribeInstances --Limit 1 --region {{region}}"
+      },
+      "verify": {
+        "json_has": "InstanceSet"
+      },
+      "fail_when": {
+        "text": "AuthFailure|UnauthorizedOperation|secretId is invalid"
+      },
+      "human": false,
+      "sensitive": false
+    }
+  ],
+  "postconditions": [
+    "vault 中有 tencent/muse-readonly 的 SecretId/SecretKey",
+    "`tccli configure list` 显示 secretId",
+    "`host list --provider tencent` 能读（19 地域约 30 秒）"
+  ],
+  "notes": "文案来自 2026-11-20 人工跑通记录；控制台角色名需上机校准后 version+1。 2026-11-20 按派单 §4.5 修正：原 create_api_key 的 navigate+then 嵌套拆成 open_user_detail / open_api_key_tab / create_new_key 三个独立步骤。 2026-11-20 校准：补 choose_accessible_type / next_to_user_info（腾讯子用户类型选择页，v3）。 2026-11-20 校准：类型卡片需点外层 DIV.item（container:true）；下一步 verify 改“填写用户信息”（v4）。 2026-11-20 校准：类型卡片用 cls=item 定位外层（v5）。 2026-11-20 校准：单选卡片改为真实鼠标事件序列点击（v6）。 2026-11-20 校准：类型卡片改用 CDP 真实点击 real_click（v7）。 2026-11-20 校准：fill_user_basic 改 near_text + 文字勾选（v8）。 2026-11-20 校准：拆出 fill_username（real_type CDP 输入）；fill_user_basic 只勾编程访问（v9）。 2026-11-20 校准：补 next_to_permission（v10）。 2026-11-20 校准：下一步改用 CDP 真实点击（v11）。 2026-11-20 校准：补 human_captcha 人机门（v12）。 2026-11-20 校准：补 next_to_tags / next_to_review；最终创建标人机门（v13）。 2026-11-20 校准完成到审阅页：类型选择→用户信息(CDP输入)→图片验证码(人机门)→权限搜索QcloudCVMReadOnlyAccess→标签→审阅；未提交创建。 2026-11-20 E2E：muse-readonly-demo 已存在，改用 muse-readonly-demo2（v15）。"
+}

@@ -1,0 +1,133 @@
+{
+  "id": "hetzner.create_readonly_user",
+  "version": 2,
+  "status": "draft",
+  "vendor": "hetzner",
+  "title": "Hetzner：建只读 API Token（项目级）+ 配 hcloud",
+  "entry": "https://console.hetzner.com/projects",
+  "preconditions": [
+    "浏览器已登录 Hetzner 账号（人机门；首次会有 Heray 安全检查，人工通过）",
+    "Hetzner token 是**项目级**的；账号下没有项目时先建一个 srvprice-readonly 项目（不产生费用）",
+    "vault 可用"
+  ],
+  "steps": [
+    {
+      "step_id": "open_projects",
+      "do": { "action": "open", "url": "https://console.hetzner.com/projects" },
+      "verify": { "text": "Projects|Projekte|项目", "timeout_ms": 25000 },
+      "fail_when": { "text": "Security Check|Checking that you are not a robot|Log in|Sign in" },
+      "human": false,
+      "sensitive": false,
+      "note": "安全检查/登录都是人机门"
+    },
+    {
+      "step_id": "click_new_project",
+      "do": { "action": "click", "match": { "role": "button", "text": "New project|Neues Projekt|新建项目" } },
+      "verify": { "text": "Project name|Projektname|项目名称", "timeout_ms": 15000 },
+      "fail_when": { "text": "Verifying|Security Check" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_project_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          { "match": { "label": "Project name|Projektname|项目名称", "id_hint": "name" }, "value": "srvprice-readonly" }
+        ]
+      },
+      "verify": { "text": "Create project|Projekt erstellen|创建", "timeout_ms": 10000 },
+      "fail_when": { "text": "already exists|bereits vorhanden" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "confirm_create_project",
+      "do": { "action": "click", "match": { "role": "button", "text": "Create project|Projekt erstellen|创建" } },
+      "verify": { "text": "Servers|Server|服务器", "timeout_ms": 25000 },
+      "fail_when": { "text": "Error|Fehler" },
+      "human": true,
+      "sensitive": false,
+      "note": "建项目是账号侧改动（用户已同意）；建项目不产生费用"
+    },
+    {
+      "step_id": "open_security",
+      "do": { "action": "click", "match": { "text": "Security|Sicherheit|安全" } },
+      "verify": { "text": "API tokens|API-Token|API 令牌", "timeout_ms": 15000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_api_tokens",
+      "do": { "action": "click", "match": { "text": "API tokens|API-Token|API 令牌" } },
+      "verify": { "text": "Generate API token|API-Token generieren|生成", "timeout_ms": 15000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "generate_token",
+      "do": { "action": "click", "match": { "role": "button", "text": "Generate API token|API-Token generieren|生成 API 令牌" } },
+      "verify": { "text": "Read|Lese|Name", "timeout_ms": 15000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_token_name",
+      "do": {
+        "action": "fill_form",
+        "fields": [
+          { "match": { "label": "Name|名称", "id_hint": "name" }, "value": "muse-readonly" }
+        ]
+      },
+      "verify": { "text": "Read|Lese|Read & Write", "timeout_ms": 10000 },
+      "fail_when": {},
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "choose_read_permission",
+      "do": { "action": "click", "match": { "text": "Read|Lese|只读" } },
+      "verify": { "text": "Read|Lese", "timeout_ms": 10000 },
+      "fail_when": { "text": "Read & Write" },
+      "human": false,
+      "sensitive": false,
+      "note": "Hetzner 只有 Read / Read & Write 两档；选 Read（只允许 GET）"
+    },
+    {
+      "step_id": "confirm_generate",
+      "do": { "action": "click", "match": { "role": "button", "text": "Generate API token|API-Token generieren|生成 API 令牌" } },
+      "verify": { "text": "token|Token", "timeout_ms": 20000 },
+      "fail_when": {},
+      "human": true,
+      "sensitive": false
+    },
+    {
+      "step_id": "capture_token",
+      "do": {
+        "action": "read_fields",
+        "fields": ["token"],
+        "store": "vault:hcloud/muse-readonly"
+      },
+      "verify": { "secret_shown_once": true },
+      "fail_when": { "text": "not available|不可用" },
+      "human": true,
+      "sensitive": true,
+      "note": "Token 只显示一次；只进 vault"
+    },
+    {
+      "step_id": "verify_readonly",
+      "do": {
+        "action": "run_command",
+        "command": "HCLOUD_TOKEN={{credential.token}} hcloud server list -o json"
+      },
+      "verify": { "json_has": "id" },
+      "fail_when": { "text": "unauthorized|invalid token|no active context" },
+      "human": false,
+      "sensitive": true,
+      "note": "只读验证：能列服务器即成功（空项目返回 []）"
+    }
+  ]
+}

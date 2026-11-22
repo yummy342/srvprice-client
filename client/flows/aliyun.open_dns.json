@@ -1,0 +1,132 @@
+{
+  "id": "aliyun.open_dns",
+  "version": 2,
+  "status": "draft",
+  "vendor": "aliyun",
+  "title": "阿里云：打开 example.com 解析记录页",
+  "entry": "https://dnsnext.console.aliyun.com/authoritative/domains",
+  "variables": {},
+  "steps": [
+    {
+      "step_id": "open_dns",
+      "do": { "action": "open", "url": "https://dnsnext.console.aliyun.com/authoritative/domains" },
+      "verify": { "text": "域名解析|云解析|域名", "timeout_ms": 20000 },
+      "fail_when": { "text": "请登录" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_records",
+      "do": { "action": "open", "url": "https://dnsnext.console.aliyun.com/authoritative/domains/example.com" },
+      "verify": { "text": "主机记录|解析设置|记录类型", "timeout_ms": 20000 },
+      "fail_when": { "text": "没有找到|无权限|404" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "click_search",
+      "do": { "action": "dom_click", "text": "精确搜索" },
+      "verify": { "text": "主机记录", "timeout_ms": 8000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_records_newtab",
+      "do": { "action": "open", "url": "https://dnsnext.console.aliyun.com/authoritative/domains/example.com", "new_tab": true },
+      "verify": { "text": "主机记录", "timeout_ms": 25000 },
+      "fail_when": { "text": "请登录" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "fill_value",
+      "do": { "action": "real_type", "match": { "near_text": "记录值集合" }, "value": "203.0.113.10" },
+      "verify": { "text": "确定", "timeout_ms": 8000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "save_pub",
+      "do": { "action": "real_click", "match": { "text": "确定" } },
+      "verify": { "text": "203.0.113.10", "timeout_ms": 15000 },
+      "fail_when": { "text": "无权限|失败" },
+      "human": false,
+      "sensitive": false,
+      "note": "用户 2026-11-22 明确授权把 pub 指向 203.0.113.10"
+    },
+    {
+      "step_id": "save_pub2",
+      "do": { "action": "dom_click", "text": "确定" },
+      "verify": { "text": "解析设置", "timeout_ms": 12000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "modal_confirm",
+      "do": { "action": "click_at", "x": 915, "y": 401 },
+      "verify": { "text": "解析设置", "timeout_ms": 12000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "dismiss_search",
+      "do": { "action": "click_at", "x": 1150, "y": 300 },
+      "verify": { "text": "主机记录", "timeout_ms": 6000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "close_search",
+      "do": { "action": "press_key", "key": "Escape" },
+      "verify": { "text": "主机记录", "timeout_ms": 6000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "open_pub_edit",
+      "do": { "action": "row_click", "row_text": "pub", "button_text": "修改" },
+      "verify": { "text": "记录值", "timeout_ms": 12000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "type_global_search",
+      "do": { "action": "real_type", "match": { "label": "搜索..." }, "value": "pub" },
+      "verify": { "text": "主机记录", "timeout_ms": 8000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "type_search",
+      "do": { "action": "real_type", "match": { "label": "请输入主机记录" }, "value": "pub" },
+      "verify": { "text": "主机记录", "timeout_ms": 8000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "press_enter",
+      "do": { "action": "press_key", "key": "Enter" },
+      "verify": { "text": "主机记录", "timeout_ms": 8000 },
+      "fail_when": { "text": "无权限" },
+      "human": false,
+      "sensitive": false
+    },
+    {
+      "step_id": "unused_open_records",
+      "do": { "action": "open", "url": "https://dnsnext.console.aliyun.com/authoritative/domains/example.com" },
+      "verify": { "text": "主机记录|解析设置|记录类型", "timeout_ms": 20000 },
+      "fail_when": { "text": "没有找到|无权限|404" },
+      "human": false,
+      "sensitive": false
+    }
+  ]
+}

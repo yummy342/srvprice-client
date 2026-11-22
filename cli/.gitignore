@@ -1,0 +1,13 @@
+node_modules/
+*.log
+*.bak*
+.env
+.env.*
+
+# 运行产物 / 本机主机清单（含真实 IP 与实例 ID）
+all_hosts.json
+all_hosts.err
+sms-dummy.json
+
+# 本机凭据（vault 之外的兜底文件）
+credentials.json
